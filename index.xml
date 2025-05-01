@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>plmi&#39;s blog</title>
+    <link>https://plmi.github.io/</link>
+    <description>Recent content on plmi&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 01 Nov 2020 22:39:09 +0100</lastBuildDate><atom:link href="https://plmi.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>About</title>
+      <link>https://plmi.github.io/about/</link>
+      <pubDate>Sun, 01 Nov 2020 22:41:44 +0100</pubDate>
+      
+      <guid>https://plmi.github.io/about/</guid>
+      <description>Github: https://github.com/plmi
+HTB: https://www.hackthebox.eu/profile/115116</description>
+    </item>
+    
+    <item>
+      <title>Smashing Minesweeper For Fun And Profit: The Timer (Part 1)</title>
+      <link>https://plmi.github.io/posts/minesweeper-01/</link>
+      <pubDate>Sun, 01 Nov 2020 22:39:09 +0100</pubDate>
+      
+      <guid>https://plmi.github.io/posts/minesweeper-01/</guid>
+      <description>0. Introduction All Windows users around the early 2000s should probably know it. It shipped with every copy of Windows XP and some other versions. I&amp;rsquo;m talking about the puzzle game Minesweeper. If you&amp;rsquo;re not familiar with this game you can lookup the gameplay mechanics here. Basically you are presented with a AxB sized grid divided into cells. Mines are scattered throughout the board. You have to uncover all non-mined cells.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Smashing Minesweeper For Fun And Profit: The Timer (Part 1) | plmi&#39;s blog</title>
+  <meta name="description" content="Hey there! I&#39;m a software developer interested in low level stuff and security. From time to time I will post something here.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Smashing Minesweeper For Fun And Profit: The Timer (Part 1)" />
+<meta property="og:description" content="0. Introduction All Windows users around the early 2000s should probably know it. It shipped with every copy of Windows XP and some other versions. I&rsquo;m talking about the puzzle game Minesweeper. If you&rsquo;re not familiar with this game you can lookup the gameplay mechanics here. Basically you are presented with a AxB sized grid divided into cells. Mines are scattered throughout the board. You have to uncover all non-mined cells." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://plmi.github.io/posts/minesweeper-01/" />
+<meta property="article:published_time" content="2020-11-01T22:39:09+01:00" />
+<meta property="article:modified_time" content="2020-11-01T22:39:09+01:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Smashing Minesweeper For Fun And Profit: The Timer (Part 1)"/>
+<meta name="twitter:description" content="0. Introduction All Windows users around the early 2000s should probably know it. It shipped with every copy of Windows XP and some other versions. I&rsquo;m talking about the puzzle game Minesweeper. If you&rsquo;re not familiar with this game you can lookup the gameplay mechanics here. Basically you are presented with a AxB sized grid divided into cells. Mines are scattered throughout the board. You have to uncover all non-mined cells."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://plmi.github.io/css/style-white.css">
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://plmi.github.io/images/favicon.ico" />
+
+  
+  
+  
+</head>
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/">Home</a></li>
+         
+        <li><a href="/posts">All posts</a></li>
+         
+        <li><a href="/about">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li>
+          <a class="icon" href="https://plmi.github.io/about/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&text=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&title=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&is_video=false&description=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29&body=Check out this article: https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&title=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&title=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&title=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&title=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&name=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29&description=0.%20Introduction%20All%20Windows%20users%20around%20the%20early%202000s%20should%20probably%20know%20it.%20It%20shipped%20with%20every%20copy%20of%20Windows%20XP%20and%20some%20other%20versions.%20I%26rsquo%3bm%20talking%20about%20the%20puzzle%20game%20Minesweeper.%20If%20you%26rsquo%3bre%20not%20familiar%20with%20this%20game%20you%20can%20lookup%20the%20gameplay%20mechanics%20here.%20Basically%20you%20are%20presented%20with%20a%20AxB%20sized%20grid%20divided%20into%20cells.%20Mines%20are%20scattered%20throughout%20the%20board.%20You%20have%20to%20uncover%20all%20non-mined%20cells.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&t=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#0-introduction">0. Introduction</a></li>
+    <li><a href="#1-information-gathering">1. Information Gathering</a></li>
+    <li><a href="#2-reversing-the-timer-function">2. Reversing the timer function</a></li>
+    <li><a href="#3-an-excourse-on-windows-message-queue">3. An excourse on Windows Message Queue</a></li>
+    <li><a href="#4-the-big-picture">4. The Big Picture!</a></li>
+    <li><a href="#5-conclusion">5. Conclusion</a></li>
+    <li><a href="#6-references">6. References</a></li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Smashing Minesweeper For Fun And Profit: The Timer (Part 1)
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2020-11-01 22:39:09 &#43;0100 CET" itemprop="datePublished">2020-11-01</time>
+          
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <h2 id="0-introduction">0. Introduction</h2>
+<p>All Windows users around the early 2000s should probably know it. It shipped with every copy of Windows XP and some other versions. I&rsquo;m talking about the puzzle game Minesweeper. If you&rsquo;re not familiar with this game you can lookup the gameplay mechanics here. Basically you are presented with a AxB sized grid divided into cells. Mines are scattered throughout the board. You have to uncover all non-mined cells. However the game is lost if the player mistakenly hits on a mine. The faster you solve it, the higher your highscore will be.</p>
+<p>This is an article series about hacking Minesweeper. We will use some basic static and dynamic analysis techniques to reverse the game mechanics. Also some Windows internal and Win32 API knowledge might come in handy. The goal is to develop some cheats :)</p>
+<p>In the first article we will have a closer look at the timer.</p>
+<h2 id="1-information-gathering">1. Information Gathering</h2>
+<p>So where do we start? At first we have to think about what we want to achieve. As I already mentioned the highscore is dependant on the timer. The best time we could hypothetically achieve is 0 seconds. But therefore we would have to manipulate the timer somehow. At a very low level perspective on that problem we are probably looking for a memory address that is constantly incremented (every second?).</p>
+<p>To find this address we use an opensource tool written in Pascal called CheatEngine and perform some dynamic memory analysis. We assume that the game stores the timer value as an integer initialized with 0. We take an inital snapshot of the current process&rsquo;s memory and only remember addresses holding a 4-byte value of 0. After the first move the timer starts ticking. We wait a few seconds and create another snapshot. This time we only remember addresses that store higher values compared to the previous snapshot. By repeating this multiple times we are finally left with a single address. The location of the timer value is <code>RVA+579C</code>.</p>
+<p><img src="/cheatengine-timer-address.png" alt="Cheatengine get timer address"></p>
+<p>CheatEngine can also show us all instruction that write to this address. In our case it&rsquo;s only this instruction:</p>
+<pre><code>Winmine__XP.exe+2FF5 - FF 05 9C570001        - inc [Winmine__XP.exe+579C] { (889) }
+</code></pre><p>We&rsquo;ve identified the instruction that increments the timer and found a good entry point for further analysis.</p>
+<h2 id="2-reversing-the-timer-function">2. Reversing the timer function</h2>
+<p>To get a better understanding of the timer function I performed some basic static analysis. I prefer IDA because it does a very good job on visualizing code paths and can also recognized parameter names of Win32 API functions for us.</p>
+<p>So this is the timer function. We can see that the timer wont start on 0 and will stop at 999s.
+<img src="/updatetimer2.png" alt="update timer function"></p>
+<p>Until now we&rsquo;ve only assumed that the timer gets updated every second but we don&rsquo;t have any proof on that yet. By checking all references to the timer function at <code>RVA+2FE0</code> we only find one at <code>RVA+1D6C</code>. By investigating the instructions around we see that <code>eax</code> gets compared against a lot of different numbers. It seems we&rsquo;re inside a huge jump table.</p>
+<p><img src="/jumptable.png" alt="jump table"></p>
+<p>Our timer function is invoked when eax is <code>275</code>. I admit it&rsquo;s pretty obvious where we are now because IDA already points it out. We are probably in the window procedure function of the main window. But to verify our guess we first need a deeper unterstanding of how Windows works internally.</p>
+<h2 id="3-an-excourse-on-windows-message-queue">3. An excourse on Windows Message Queue</h2>
+<p>Windows is an event driven system. An application does not ask for user or system events but it gets informed by the system. Therefore the system uses so called <em>window messages</em>. These messages get processed in an application-defined callback function called <code>WindowProc</code>. The <code>WNDCLASSEX</code> structure holds a pointer to this callback and is passed to the <code>RegisterClassEx</code> to register a window class. From here new windows of that class can be registered with <code>CreateWindow(Ex)</code>. The following code demonstrates this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;windows.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> g_szClassName[] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ASimpleWindowClass&#34;</span>;
+
+<span style="color:#66d9ef">int</span> WINAPI <span style="color:#a6e22e">WinMain</span>(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, <span style="color:#66d9ef">int</span> nCmdShow)
+{
+  WNDCLASSEX wc;
+  HWND hwnd;
+  MSG Msg;
+
+  <span style="color:#75715e">// Register window class
+</span><span style="color:#75715e"></span>  wc.cbSize         <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(WNDCLASSEX);
+  wc.style          <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  wc.lpfnWndProc    <span style="color:#f92672">=</span> WndProc;  <span style="color:#75715e">// callback to window procedure
+</span><span style="color:#75715e"></span>  wc.cbClsExtra     <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  wc.cbWndExtra     <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  wc.hInstance      <span style="color:#f92672">=</span> hInstance;
+  wc.hIcon          <span style="color:#f92672">=</span> LoadIcon(NULL, IDI_APPLICATION);
+  wc.hCursor        <span style="color:#f92672">=</span> LoadCursor(NULL, IDC_ARROW);
+  wc.hbrBackground  <span style="color:#f92672">=</span> (HBRUSH)(COLOR_WINDOW<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>);
+  wc.lpszMenuName   <span style="color:#f92672">=</span> NULL;
+  wc.lpszClassName  <span style="color:#f92672">=</span> g_szClassName;
+  wc.hIconSm        <span style="color:#f92672">=</span> LoadIcon(NULL, IDI_APPLICATION);
+
+  <span style="color:#75715e">// Create window from class
+</span><span style="color:#75715e"></span>  hwnd <span style="color:#f92672">=</span> CreateWindowEx(
+    WS_EX_CLIENTEDGE,
+    g_szClassName,
+    <span style="color:#e6db74">&#34;I&#39;m a new window&#34;</span>,
+    WS_OVERLAPPEDWINDOW,
+    CW_USEDEFAULT, CW_USEDEFAULT, <span style="color:#ae81ff">240</span>, <span style="color:#ae81ff">120</span>,
+    NULL, NULL, hInstance, NULL);
+
+  <span style="color:#75715e">// Program continues
+</span></code></pre></div><p>To retrieve messages from the application&rsquo;s message queue a message loop is required. <code>GetMessage</code> waits until a new message is on the queue and directly sends it to our window procedure. Some keyboard or mouse events first require some kind of translation before they are dispatched to the window procedure.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">  <span style="color:#66d9ef">while</span> (GetMessage(<span style="color:#f92672">&amp;</span>Msg, NULL, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+    TranslateMessage(<span style="color:#f92672">&amp;</span>Msg);
+    DispatchMessage(<span style="color:#f92672">&amp;</span>Msg);
+  }
+
+  <span style="color:#66d9ef">return</span> Msg.wParam;
+}
+</code></pre></div><p>The window procedure itself processes the window messages sent to a window. Here we can decide how to handle certain events.</p>
+<h2 id="4-the-big-picture">4. The Big Picture!</h2>
+<p>With this in mind we can now verify our assumptions about the timer. The number <code>275</code> is the decimal representaion of the <code>WM_TIMER</code> message sent to our window!  A <code>WM_TIMER</code> message is published by a timer created by the <code>SetTimer</code> function. MSDN states:</p>
+<blockquote>
+<p>If lpTimerFunc is NULL, the system posts a WM_TIMER message to the application queue.</p>
+</blockquote>
+<p>The import address table of the PE file actually holds an entry for that function. By referencing its address in IDA we find the address where the timer actually gets created! <code>lpTimerFunc</code> is indeed <code>NULL</code> and the timer&rsquo;s interval defined by <code>uElapse</code> is 1000ms (0x3E8h). Now we know why the timer increases every second :)</p>
+<p><img src="/settimer.png" alt="Call to SetTimer"></p>
+<p>The big jump table we saw earlier is a big switch-case statement inside the <code>WndProc</code> callback function at <code>RVA+1BC9</code>. By checking the references to this address we find a call to <code>RegisterClassEx</code> where this callback is passed to.</p>
+<p><img src="/registerclassex.png" alt="RegisterClassEx"></p>
+<p>The actual code inside the <code>WndProc</code> callback might look something like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">LRESULT CALLBACK <span style="color:#a6e22e">WndProc</span>(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+  <span style="color:#66d9ef">switch</span>(msg) {
+    <span style="color:#75715e">// ...
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">case</span> WM_TIMER:
+      <span style="color:#75715e">// call update timer function
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">break</span>;
+  }
+  <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><h2 id="5-conclusion">5. Conclusion</h2>
+<p>That&rsquo;s all for this part. We used some very basic analysis techniques to discover the timer&rsquo;s update function. With some knowledge about how windows process messages we were able identify the location where the timer was initially created! We now have a solid understanding of how the timer in Minesweeper actually works. In the second part of this article we will have a look at some techniques to finally control the timer!</p>
+<h2 id="6-references">6. References</h2>
+<ul>
+<li><a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmessage">GetMessage</a></li>
+<li><a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerclassexa">RegisterClassEx</a></li>
+<li><a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexa">CreateWindowEx</a></li>
+<li><a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-settimer">SetTimer</a></li>
+<li><a href="https://wiki.winehq.org/List_Of_Windows_Messages">List of Windows Messages</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/posts">All posts</a></li>
+         
+          <li><a href="/about">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#0-introduction">0. Introduction</a></li>
+    <li><a href="#1-information-gathering">1. Information Gathering</a></li>
+    <li><a href="#2-reversing-the-timer-function">2. Reversing the timer function</a></li>
+    <li><a href="#3-an-excourse-on-windows-message-queue">3. An excourse on Windows Message Queue</a></li>
+    <li><a href="#4-the-big-picture">4. The Big Picture!</a></li>
+    <li><a href="#5-conclusion">5. Conclusion</a></li>
+    <li><a href="#6-references">6. References</a></li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&text=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&title=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&is_video=false&description=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29&body=Check out this article: https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&title=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&title=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&title=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&title=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&name=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29&description=0.%20Introduction%20All%20Windows%20users%20around%20the%20early%202000s%20should%20probably%20know%20it.%20It%20shipped%20with%20every%20copy%20of%20Windows%20XP%20and%20some%20other%20versions.%20I%26rsquo%3bm%20talking%20about%20the%20puzzle%20game%20Minesweeper.%20If%20you%26rsquo%3bre%20not%20familiar%20with%20this%20game%20you%20can%20lookup%20the%20gameplay%20mechanics%20here.%20Basically%20you%20are%20presented%20with%20a%20AxB%20sized%20grid%20divided%20into%20cells.%20Mines%20are%20scattered%20throughout%20the%20board.%20You%20have%20to%20uncover%20all%20non-mined%20cells.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fplmi.github.io%2fposts%2fminesweeper-01%2f&t=Smashing%20Minesweeper%20For%20Fun%20And%20Profit%3a%20The%20Timer%20%28Part%201%29">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  plmi&#39;s blog 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/">Home</a></li>
+         
+        <li><a href="/posts">All posts</a></li>
+         
+        <li><a href="/about">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>
