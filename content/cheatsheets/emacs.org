@@ -56,6 +56,36 @@ After killing a line move to the desired location and use ~C-y~ to paste it.
 | C-/ | Undo last operation |
 | C-? | Redo last operation |
 
+* Window Management
+# Emacs terminology: Frame = OS window, Window = split pane, Buffer = file/content
+
+** Frames (OS windows)
+
+| Key     | Action                |
+|---------+-----------------------|
+| C-x 5 2 | Create a new frame    |
+| C-x 5 0 | Close current frame   |
+| C-x 5 o | Switch to next frame  |
+
+** Windows (split panes)
+
+| Key   | Action                                 |
+|-------+----------------------------------------|
+| C-x 2 | Split window horizontally (top/bottom) |
+| C-x 3 | Split window vertically (left/right)   |
+| C-x 0 | Close current window                   |
+| C-x 1 | Close all other windows (maximise)     |
+| C-x o | Switch to next window                  |
+
+** Buffers
+
+| Key     | Action                               |
+|---------+--------------------------------------|
+| C-x C-f | Open / create a new file in a buffer |
+| C-x b   | Switch to a buffer (prompts by name) |
+| C-x C-b | List all open buffers                |
+| C-x k   | Kill (close) current buffer          |
+
 * Dired (File Manager)
 
 ** Opening & Closing
