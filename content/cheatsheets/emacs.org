@@ -1,0 +1,77 @@
+#+TITLE: emacs cheatsheet
+#+AUTHOR: Michael Plankl
+#+OPTIONS: toc:2 num:nil
+
+* Navigation
+
+** Cursor Movement
+
+| Key       | Action                        |
+| C-f / C-b | Forward / backward one char   |
+| M-f / M-b | Forward / backword one word   |
+| C-a / C-e | Line start / end              |
+
+** Jump to position
+
+| Key | Action |
+| M-< | Jump to beginning of buffer | 
+| M-> | Jump to end of buffer |
+| M-g g | Jump to specific line number |
+
+* Editing
+
+** Cut / Copy / Paste
+
+| C-w | Cut (kill) region                   |
+| M-w | Copy (kill-ring-save)               |
+| C-y | Paste (yank)                        |
+| M-y | Cycle through earlier kills         |
+| M-d | Delete word forward (like Vim ~cw~) |
+
+** Setting the mark (selecting text)
+
+| Key           | Action                       |
+| C-Space / C-@ | Set start of mark            |
+| C-g           | Cancel / deactivate the mark |
+
+** Kill (delete) line
+
+| Key                 | Action                            |
+| C-a C-k C-k         | Delete whole line (like Vim ~dd~) |
+| C-k                 | Kill from cursor to end of line   |
+| M-x kill-whole-line | Delete entire line at cursor      |
+
+After killing a line move to the desired location and use ~C-y~ to paste it.
+
+** Undo / redo
+
+| Key | Action              |
+| C-/ | Undo last operation |
+| C-? | Redo last operation |
+
+* Dired (File Manager)
+
+** Opening & Closing
+
+| Key     | Action                             |
+| C-x d   | Open Dired (Prompts for directory  |
+| C-x C-f | Open Dired (Prompts for file)      |
+| C-x C-j | Jump to Dired in current directory |
+| q       | Close Dired buffer                 |
+
+** File Operations
+
+| Key       | Action                                     |
+| +         | Create a new directory                     |
+| C-x C-f   | Creates a new file (open for editing)      |
+| m         | Mark a file                                |
+| t         | Toggle mark (invert selection)             |
+| u         | Unmark a file                              |
+| U         | Unmark all files                           |
+| d         | Mark file(s) for deletion                  |
+| C         | Copy marked file(s)                        |
+| D         | Delete file immediatley (no mark required) |
+| R         | Rename / move a file                       |
+| x         | Execute deletion (confirm marked file(s))  |
+| % m REGEX | Mark files matching a regex pattern        |
+
