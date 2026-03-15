@@ -1,4 +1,5 @@
-#+TITLE: emacs cheatsheet
+#+TITLE: emacs
+#+DATE: 2026-03-15
 #+AUTHOR: Michael Plankl
 #+OPTIONS: toc:2 num:nil
 

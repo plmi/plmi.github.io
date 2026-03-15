@@ -1,8 +1,8 @@
 #+title: whoami
 #+date: 2026-03-15
 
-Security researcher interested in penetration testing, digital forensics, and CTF
-competitions. Currently preparing for the OSCP certification.
+Security researcher interested in penetration testing, digital forensics, CTF
+competitions, and agentic engineering. Currently preparing for the OSCP certification.
 
 This blog serves as a personal knowledge base — cheatsheets, writeups, and
 technical notes I can reference quickly during lab work and exam prep.
@@ -11,7 +11,7 @@ technical notes I can reference quickly during lab work and exam prep.
 
 ** Publication
 
-- [[https://dfrws.org/presentation/addressing-the-dataset-gap-problem-with-generative-ai-towards-llm-driven-forensic-scenarios-for-dataset-generation/][Addressing the Dataset Gap Problem with Generative AI: Towards LLM-Driven Forensic Scenarios for Dataset Generation]] — DFRWS
+- [[https://dfrws.org/presentation/addressing-the-dataset-gap-problem-with-generative-ai-towards-llm-driven-forensic-scenarios-for-dataset-generation/][Addressing the Dataset Gap Problem with Generative AI: Towards LLM-Driven Forensic Scenarios for Dataset Generation]] — DFRWS EU 2026
 
 ** Profiles
 
