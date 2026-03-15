@@ -1,0 +1,30 @@
+{{ define "main" }}
+<header>
+  <h1 class="mb0"><span class="prefix">../</span> <a href="/" style="color: inherit; text-decoration: none;">{{ .Site.Title }}</a></h1>
+  <nav>
+    <ul>
+      {{ range .Site.Menus.main }}
+      <li><a href="{{ .URL }}">{{ .Name }}</a></li>
+      {{ end }}
+    </ul>
+  </nav>
+</header>
+
+<p class="intro">{{ .Site.Params.description }}</p>
+
+<div class="line"></div>
+
+{{ range .Site.Sections.ByWeight }}
+<h3 class="section-title">{{ .Title }}</h3>
+<section>
+  {{ range .Pages.ByDate.Reverse }}
+  <article class="archive-link">
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>
+    —
+    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+  </article>
+  {{ end }}
+</section>
+<div class="line"></div>
+{{ end }}
+{{ end }}

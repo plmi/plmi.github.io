@@ -1,0 +1,24 @@
+{{ define "main" }}
+<header>
+  <h1 class="mb0"><a href="/">../</a> {{ .Title }}</h1>
+  <nav>
+    <ul>
+      {{ range .Site.Menus.main }}
+      <li><a href="{{ .URL }}">{{ .Name }}</a></li>
+      {{ end }}
+    </ul>
+  </nav>
+</header>
+
+<div class="line"></div>
+
+<section>
+  {{ range .Pages.ByDate.Reverse }}
+  <article class="archive-link">
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>
+    —
+    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+  </article>
+  {{ end }}
+</section>
+{{ end }}

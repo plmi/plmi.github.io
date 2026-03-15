@@ -1,0 +1,299 @@
+:root {
+    --font-size: 16px;
+    --font-family: 'Inter', sans-serif;
+    --content-padding: 2rem;
+    --post-font-family: 'Inter', sans-serif;
+    --post-font-size: 17px;
+    --post-line-height: 2rem;
+    --img-max-width: 85%;
+    --color: #111;
+    --bg-color: #fffff8;
+    --link-color: #4e5192;
+    --link-hover-color: #30325b;
+    --code-font-size: 14px;
+    --pre-line-height: 1.5em;
+    --code-bg-color: #202020;
+    --code-color: #fffff8;
+    --line-color: #dedede;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --content-padding: 0.75rem;
+        --img-max-width: 100%;
+        --post-font-size: 16px;
+        --post-line-height: 1.75rem;
+    }
+    .archive-link + .archive-link {
+        margin-top: 1rem;
+    }
+}
+
+/* Reset & base */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    background: var(--bg-color);
+    color: var(--color);
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 400;
+}
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+a:focus, a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
+/* Layout */
+.main-content {
+    padding: var(--content-padding);
+    max-width: 48rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Header */
+header h1 {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+header h1 .prefix {
+    color: var(--link-color);
+}
+header nav ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+header nav li {
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+/* Divider */
+.line:not(span) {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--line-color);
+}
+hr {
+    border-style: solid;
+    border-color: var(--line-color);
+    border-width: 0 0 1px 0;
+}
+
+/* Homepage intro */
+.intro {
+    margin-bottom: 0;
+    font-size: var(--post-font-size);
+    line-height: var(--post-line-height);
+}
+
+/* Section headings on homepage */
+.section-title {
+    font-size: 1rem;
+    font-weight: 400;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Article list */
+.archive-link {
+    margin: 0.4rem 0;
+    line-height: 1.4;
+}
+.archive-link time {
+    color: var(--color);
+}
+
+/* Post / page content */
+.post-title {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.post-title a {
+    color: var(--link-color);
+}
+
+.page-content h1 {
+    font-size: 1.75em;
+    border-bottom: 1px solid var(--line-color);
+    padding-bottom: 1rem;
+}
+.page-content h2,
+.page-content h3,
+.page-content h4 {
+    margin-top: 2rem;
+}
+.page-content p,
+.page-content ul,
+.page-content ol,
+.page-content table {
+    font-family: var(--post-font-family);
+    font-size: var(--post-font-size);
+    line-height: var(--post-line-height);
+}
+.page-content a {
+    font-weight: bold;
+}
+.page-content img {
+    max-width: var(--img-max-width);
+    display: block;
+    margin: 2em auto;
+    border: 3px solid rgba(0, 0, 0, 0.2);
+    height: auto;
+}
+
+/* Code */
+/* Inline code: dark background, light text */
+p > code,
+li > code,
+td > code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--code-font-size);
+    background-color: var(--code-bg-color);
+    color: var(--code-color);
+    padding: 0.15em 0.3em;
+}
+
+/* Strip the div.highlight wrapper Hugo adds around code blocks */
+div.highlight {
+    margin: 0;
+}
+
+/* Shell/bash blocks: light background, dark text, no syntax colours.
+   Matches the reference's command-line bash blocks.
+   Hugo uses data-lang="sh" for org #+begin_src sh and "bash" for #+begin_src bash. */
+div.highlight pre:has(> code[data-lang="bash"]),
+div.highlight pre:has(> code[data-lang="sh"]),
+div.highlight pre:has(> code[data-lang="shell"]) {
+    background-color: var(--bg-color) !important;
+    color: var(--color) !important;
+}
+div.highlight pre:has(> code[data-lang="bash"]) span,
+div.highlight pre:has(> code[data-lang="sh"]) span,
+div.highlight pre:has(> code[data-lang="shell"]) span {
+    color: inherit !important;
+}
+
+/* Block code: light background, dark text, dark border */
+pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--code-font-size);
+    line-height: var(--pre-line-height);
+    background-color: var(--bg-color);
+    color: var(--color);
+    border: 3px solid rgba(0, 0, 0, 0.5);
+    padding: 1em;
+    overflow-x: auto;
+}
+pre code {
+    font-family: inherit;
+    background: none;
+    color: inherit;
+    padding: 0;
+    font-size: inherit;
+}
+
+/* #+begin_example: inherits base pre styling — terminal output, no highlighting */
+
+/* Figures / image captions */
+figure {
+    margin: 2em 0;
+    text-align: center;
+}
+figure img {
+    max-width: var(--img-max-width);
+    display: block;
+    margin: 0 auto;
+    border: 3px solid rgba(0, 0, 0, 0.2);
+    height: auto;
+}
+figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.85em;
+    color: #777;
+}
+
+/* Table of Contents — fixed left sidebar */
+.toc {
+    opacity: 0.25;
+    position: fixed;
+    top: 14%;
+    left: 1%;
+    white-space: nowrap;
+    max-width: 15%;
+    max-height: 600px;
+    overflow-y: hidden;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+.toc:hover {
+    opacity: 0.8;
+    overflow-y: auto;
+}
+.toc ul {
+    margin: 0;
+    padding-left: 12px;
+    padding-top: 0.2em;
+    list-style: none;
+}
+.toc li {
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    padding: 0.2em 0;
+}
+.toc a {
+    font-weight: normal;
+}
+@media (max-width: 1200px) {
+    .toc {
+        display: none;
+    }
+}
+
+/* Centered text blocks (#+BEGIN_CENTER) */
+.center {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+/* YouTube / video embeds */
+.video-embed {
+    margin: 2em 0;
+    text-align: center;
+}
+.video-embed iframe {
+    width: 100%;
+    max-width: 640px;
+    height: 360px;
+    border: 3px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Tables */
+.page-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.5rem 0;
+}
+.page-content th,
+.page-content td {
+    border: 1px solid var(--line-color);
+    padding: 0.4rem 0.75rem;
+    text-align: left;
+}
+.page-content th {
+    background-color: rgba(0,0,0,0.04);
+}

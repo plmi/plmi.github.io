@@ -1,0 +1,39 @@
+baseURL = "/"
+languageCode = "en-us"
+title = "My Blog"
+theme = "lt"
+
+[markup]
+  [markup.highlight]
+    style = "nord"
+  [markup.tableOfContents]
+    startLevel = 1
+    endLevel = 4
+  [markup.goldmark.renderer]
+    unsafe = true
+
+[pagination]
+  pagerSize = 10
+
+[params]
+  description = "Whenever I find a grain of time between my occupations, I write."
+
+[[menus.main]]
+  name = "whoami"
+  url = "/whoami/"
+  weight = 0
+
+[[menus.main]]
+  name = "tech"
+  url = "/tech/"
+  weight = 1
+
+[[menus.main]]
+  name = "writeups"
+  url = "/writeups/"
+  weight = 2
+
+[[menus.main]]
+  name = "cheatsheets"
+  url = "/cheatsheets/"
+  weight = 3

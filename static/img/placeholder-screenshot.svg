@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="350" style="background:#1a1a2e">
+  <rect width="700" height="24" fill="#2d2d44"/>
+  <circle cx="14" cy="12" r="5" fill="#ff5f57"/>
+  <circle cx="30" cy="12" r="5" fill="#febc2e"/>
+  <circle cx="46" cy="12" r="5" fill="#28c840"/>
+  <text x="350" y="13" text-anchor="middle" font-family="monospace" font-size="11" fill="#888">terminal</text>
+  <text x="20" y="60" font-family="monospace" font-size="13" fill="#50fa7b">root@kali</text>
+  <text x="104" y="60" font-family="monospace" font-size="13" fill="#f8f8f2">:~#</text>
+  <text x="132" y="60" font-family="monospace" font-size="13" fill="#f8f8f2">nmap -sC -sV 10.10.10.68</text>
+  <text x="20" y="90"  font-family="monospace" font-size="12" fill="#6272a4">Starting Nmap 7.91 ( https://nmap.org )</text>
+  <text x="20" y="112" font-family="monospace" font-size="12" fill="#f8f8f2">PORT   STATE SERVICE VERSION</text>
+  <text x="20" y="132" font-family="monospace" font-size="12" fill="#50fa7b">22/tcp open  ssh     OpenSSH 7.9p1 Debian</text>
+  <text x="20" y="152" font-family="monospace" font-size="12" fill="#50fa7b">80/tcp open  http    Apache httpd 2.4.38</text>
+  <text x="20" y="172" font-family="monospace" font-size="12" fill="#f8f8f2">|_http-title: Arrexel&#39;s Development Site</text>
+  <text x="20" y="210" font-family="monospace" font-size="13" fill="#50fa7b">root@kali</text>
+  <text x="104" y="210" font-family="monospace" font-size="13" fill="#f8f8f2">:~# _</text>
+  <rect x="1" y="25" width="698" height="300" fill="none" stroke="#444" stroke-width="1"/>
+  <text x="350" y="310" text-anchor="middle" font-family="monospace" font-size="11" fill="#555">[ replace with actual screenshot ]</text>
+</svg>

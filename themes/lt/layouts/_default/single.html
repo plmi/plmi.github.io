@@ -1,0 +1,12 @@
+{{ define "main" }}
+{{ if .TableOfContents }}
+<nav class="toc">
+  {{ .TableOfContents }}
+</nav>
+{{ end }}
+<h1 class="post-title"><a href="{{ .CurrentSection.RelPermalink }}">../</a> {{ .Title }}</h1>
+<div class="line"></div>
+<div class="page-content">
+  {{ .Content }}
+</div>
+{{ end }}

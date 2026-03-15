@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="220" style="background:#1a1a2e">
+  <rect width="700" height="24" fill="#2d2d44"/>
+  <circle cx="14" cy="12" r="5" fill="#ff5f57"/>
+  <circle cx="30" cy="12" r="5" fill="#febc2e"/>
+  <circle cx="46" cy="12" r="5" fill="#28c840"/>
+  <text x="350" y="13" text-anchor="middle" font-family="monospace" font-size="11" fill="#888">ls -la /etc/cron.d</text>
+  <text x="20" y="55"  font-family="monospace" font-size="12" fill="#6272a4">total 32</text>
+  <text x="20" y="75"  font-family="monospace" font-size="12" fill="#f8f8f2">drwxr-xr-x  2 root root 4096 Dec  4  2017 .</text>
+  <text x="20" y="95"  font-family="monospace" font-size="12" fill="#f8f8f2">drwxr-xr-x 96 root root 4096 Nov  5 18:54 ..</text>
+  <text x="20" y="115" font-family="monospace" font-size="12" fill="#50fa7b">-rw-r--r--  1 root root  712 Jan  1  2017 php</text>
+  <text x="20" y="135" font-family="monospace" font-size="12" fill="#ff79c6">-rw-r--r--  1 root root  102 Apr  5  2016 .placeholder</text>
+  <text x="20" y="155" font-family="monospace" font-size="12" fill="#50fa7b">-rwxrwxrwx  1 root root   29 Nov  5 17:02 scripts</text>
+  <rect x="1" y="25" width="698" height="190" fill="none" stroke="#444" stroke-width="1"/>
+  <text x="350" y="202" text-anchor="middle" font-family="monospace" font-size="11" fill="#555">[ replace with actual screenshot ]</text>
+</svg>
