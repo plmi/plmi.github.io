@@ -86,6 +86,78 @@ After killing a line move to the desired location and use ~C-y~ to paste it.
 | C-x C-b | List all open buffers                |
 | C-x k   | Kill (close) current buffer          |
 
+* Org Mode
+
+** Structre templates (type then ~Tab~ to expand)
+
+| Shortcut | Expands to                            |
+|----------+---------------------------------------|
+| <s       | #+BEGIN_SRC ... #+END_SRC             |
+| C-c '    | Edit source block in dedicated buffer |
+| <e       | #+BEGIN_EXAMPLE ... #+END_EXAMPLE     |
+| <q       | #+BEGIN_QUOTE ... #+END_QUOTE         |
+| <c       | #+BEGIN_CENTER ... #+END_CENTER       |
+| <l       | #+BEGIN_EXPORT latex ... #+END_EXPORT |
+| <h       | #+BEGIN_EXPORT html ... #+END_EXPORT  |
+| <a       | #+BEGIN_EXPORT ascii ... #+END_EXPORT |
+| <c       | #+BEGIN_COMMENT ... #+END_COMMENT     |
+
+Note: requires ~(require 'org-tempo)` in config in Emacs 26+.
+
+** Headings
+
+| Key           | Action                                    |
+|---------------+-------------------------------------------|
+| M-RET         | Insert new heading at same level          |
+| M-RIGHT       | Demote heading (e.g. * to **)             |
+| M-LEFT        | Promote heading (e.g. ** to *)            |
+| M-UP / M-DOWN | Move heading up / down                    |
+| Tab           | Cycle fold state of current heading       |
+| S-Tab         | Cycle fold state of all headings globally |
+| C-c C-n       | Jump to next heading                      |
+| C-c C-p       | Jump to previous heading                  |
+
+** Tables
+
+| Key              | Action                           |
+|------------------+----------------------------------|
+| Tab              | Move to next cell                |
+| S-Tab            | Move to previous cell            |
+| RET              | Move to next row                 |
+| M-RET            | Insert new row below             |
+| C-c C-c          | Re-align table without moving    |
+| C-c -            | Insert horizontal separator row  |
+| C-c ^            | Sort table by current column     |
+| M-UP / M-DOWN    | Move current row up / down       |
+| M-LEFT / M-RIGHT | Move current column left / right |
+
+** Links
+
+| Key     | Action                         |
+|---------+--------------------------------|
+| C-c C-l | Insert or edit link            |
+| C-c C-o | Open link at cursor            |
+
+** Todo & Agenda
+
+| Key         | Action                                  |
+|-------------+-----------------------------------------|
+| C-c C-t     | Cycle TODO state (TODO -> DONE -> none) |
+| C-c C-d     | Set a deadline                          |
+| C-c C-s     | Set a schedule date                     |
+| C-c C-x C-i | Clock in (start timing a task)          |
+| C-c C-x C-o | Clock out                               |
+| C-c a       | Open the agenda dispatcher              |
+
+** Export
+
+| Key         | Action                    |
+|-------------+---------------------------|
+| C-c C-e     | Open export dispatcher    |
+| C-c C-e h h | Export to HTML file       |
+| C-c C-e l p | Export to PDF (via LaTeX) |
+| C-c C-e t u | Export to plain text      |
+
 * Dired (File Manager)
 
 ** Opening & Closing
@@ -99,17 +171,19 @@ After killing a line move to the desired location and use ~C-y~ to paste it.
 
 ** File Operations
 
-| Key       | Action                                      |
-|-----------+---------------------------------------------|
-| +         | Create a new directory                      |
-| C-x C-f   | Create a new file (open for editing)        |
-| m         | Mark a file                                 |
-| t         | Toggle mark (invert selection)              |
-| u         | Unmark a file                               |
-| U         | Unmark all files                            |
-| d         | Mark file(s) for deletion                   |
-| C         | Copy marked file(s)                         |
-| D         | Delete file immediately (no mark required)  |
-| R         | Rename / move a file                        |
-| x         | Execute deletion (confirm marked file(s))   |
-| % m REGEX | Mark files matching a regex pattern         |
+| Key       | Action                                              |
+|-----------+-----------------------------------------------------|
+| +         | Create a new directory                              |
+| C-x C-f   | Create a new file (open for editing)                |
+| m         | Mark a file                                         |
+| t         | Toggle mark (invert selection)                      |
+| u         | Unmark a file                                       |
+| U         | Unmark all files                                    |
+| d         | Mark file(s) for deletion                           |
+| C         | Copy marked file(s)                                 |
+| D         | Delete file immediately (no mark required)          |
+| R         | Rename / move a file                                |
+| x         | Execute deletion (confirm marked file(s))           |
+| % m REGEX | Mark files matching a regex pattern                 |
+| W         | Runs ~browse-url-of-file~ and opens file in browser |
+
