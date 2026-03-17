@@ -10,31 +10,29 @@
 
 Copy exploit to local directory
 #+begin_src bash
-  searchsploit -m 44904
+searchsploit -m 44904
 #+end_src
 
 View exploit
 #+begin_src bash
-  searchsploit -x 44904
+searchsploit -x 44904
 #+end_src
 
 Search just by title
 #+begin_src bash
-  searchsploit -t squirrelmail metasploit
+searchsploit -t squirrelmail metasploit
 #+end_src
 
 *** nmap NSE scripts
 
 Find exploits in NSE scripts
 #+begin_src bash
-  grep Exploits /usr/share/nmap/scripts/*.nse
-#+end_src
+grep Exploits /usr/share/nmap/scripts/*.nse
 
-#+begin_example
 /usr/share/nmap/scripts/clamav-exec.nse:Exploits ClamAV servers vulnerable to unauthenticated clamav comand execution.
-#+end_example
+#+end_src
 
 Get help for NSE script
 #+begin_src bash
-  nmap --script-help=clamav-exec.nse
+nmap --script-help=clamav-exec.nse
 #+end_src
