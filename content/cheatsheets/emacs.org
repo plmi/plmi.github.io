@@ -24,13 +24,14 @@
 
 ** Cut / Copy / Paste
 
-| Key | Action                              |
-|-----+-------------------------------------|
-| C-w | Cut (kill) region                   |
-| M-w | Copy (kill-ring-save)               |
-| C-y | Paste (yank)                        |
-| M-y | Cycle through earlier kills         |
-| M-d | Delete word forward (like Vim ~cw~) |
+| Key     | Action                              |
+|---------+-------------------------------------|
+| C-w     | Cut (kill) region                   |
+| M-w     | Copy (kill-ring-save)               |
+| C-y     | Paste (yank)                        |
+| M-y     | Cycle through earlier kills         |
+| M-d     | Delete word forward (like Vim ~cw~) |
+| S-Mouse | Select text in termal mode          |
 
 ** Setting the mark (selecting text)
 
