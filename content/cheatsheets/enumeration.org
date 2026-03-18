@@ -6,6 +6,63 @@
 
 ** Network Scanning
 
+#+BEGIN_QUOTE
+*Rule:* Always save output. You will need it for the report and for grepping later.
+*Rule:* Always run UDP. SNMP, TFTP, IKE — you will miss them if you skip it.
+*Rule:* When a scan returns nothing, add `-Pn`. Firewall is dropping pings.
+#+END_QUOTE
+
+-----
+
+*** Default Workflow (run this on every new host)
+
+#+BEGIN_SRC bash
+# Step 1 — Full TCP (background this immediately)
+sudo nmap -sS -p- -T4 -Pn $IP -oA scans/$IP-tcp-full
+
+# Step 2 — Top 20 UDP (run in parallel with step 1)
+sudo nmap -sU --top-ports 20 -T4 -Pn $IP -oA scans/$IP-udp-top20
+
+# Step 3 — Service + version on discovered open ports (after step 1 finishes)
+sudo nmap -sV -sC -p <OPEN_PORTS> -Pn $IP -oA scans/$IP-services
+
+# Step 4 — Vuln scripts on interesting ports (targeted, not blanket)
+sudo nmap -sV -p <PORT> --script vuln -Pn $IP -oA scans/$IP-vuln
+#+END_SRC
+
+#+BEGIN_QUOTE
+*Tip:* Use =mkdir -p scans= in your working directory before you start. Name files by IP so output never collides.
+#+END_QUOTE
+
+*** Phase 1 - Host Discovery
+
+*Goal:* Find live hosts before scanning ports.
+
+**** Network Sweep
+
+Sends TCP SYN (80), TCP ACK (443), ICMP timestamp
+
+#+BEGIN_SRC bash
+nmap -sn 192.168.50.0/24 -oG scans/sweep.txt
+#+END_SRC
+
+#+BEGIN_QUOTE
+*Exam gotcha:* If =-sn= shows no hosts, try ARP. If still nothing, skip discovery and scan the IP directly with =-Pn=.
+#+END_QUOTE
+
+**** ARP Sweep
+
+Use when ICMP is blocked (internal network)
+
+#+BEGIN_SRC bash
+sudo netdiscover -i eth0 -r 192.168.50.0/24
+sudo arp-scan --interface=eth0 192.168.50.0/24
+#+END_SRC
+
+**** DNS Reverse Lookup
+
+...
+
 *** Phase 2: Port Scanning
 
 /Goal: Find every open port. Completeness matters more than speed./
@@ -18,6 +75,186 @@ sudo nmap -sS -p- -T4 -Pn $IP -oA scans/$IP-tcp-full
 # rustscan (faster, pipe to nmap for service detection)
 rustscan -a $IP --ulimit 5000 -t 4000 --tries 2 --scan-order serial
 #+end_src
+
+**** UDP
+
+Always run this (never skip)
+#+begin_src bash
+# Top 20 UDP ports (fast, catches 95% of interesting services)
+sudo nmap -sU --top-ports 20 -T4 -Pn $IP -oA scans/$IP-udp-top20
+
+# Full UDP scan (slow — only if you suspect something specific)
+sudo nmap -sU -p- -T4 -Pn $IP -oA scans/$IP-udp-full
+#+end_src
+
+#+BEGIN_QUOTE
+*Note:* Unreliable! High risk of False Positives or missed ports because firewalls often drop ICMP responses
+#+END_QUOTE
+
+**Critical UDP ports to always check manually if scan is unclear:**
+
+| Port | Service | Why it matters                                |
+|------+---------+-----------------------------------------------|
+|   53 | DNS     | Zone transfer, internal hostnames             |
+|   69 | TFTP    | Unauthenticated file read/write               |
+|  161 | SNMP    | Community strings → credentials, network info |
+|  500 | IKE/VPN | See 500 -IKE                                  |
+|  623 | IPMI    | Default creds → BMC access                    |
+
+**** Scan Specific Port Across a Subnet
+
+#+begin_src bash
+# Find all hosts with port 445 open (SMB)
+sudo nmap -sS -p 445 192.168.50.0/24 -T4 -oG scans/smb-sweep.txt
+#+end_src
+
+*** Phase 3: Service and OS Discovery
+
+/Goal: Identify software and versions to match against exploits./
+
+**** Default TCP Service Scan
+
+Use after full TCP scan!
+#+begin_src bash
+sudo nmap -sV -sC -p <OPEN_PORTS> -Pn $IP -oA scans/$IP-services
+
+sudo nmap -vv --reason -Pn -sV -sC --version-all -oN scans/_quick_tcp_nmap.txt $IP
+#+end_src
+
+**** Aggressive Service Scan
+
+#+begin_src 
+sudo nmap -A $IP
+
+# equals to:
+sudo nmap -sS -sV -sC -T4 -O --traceroute 192.168.50.14
+#+end_src
+
+#+begin_src 
+sudo rustscan -u 5000 -b 1900 -t 4000 --tries 2 --scan-order serial -a $IP -- -A -sVC --script=safe,default,discovery,version,vuln | sudo tee rustscan-full-result
+#+end_src
+
+**** OS Fingerprinting
+#+begin_src bash
+sudo nmap -O --osscan-guess -Pn $IP
+# -O: OS fingerprinting
+# --osscan-guess: force to print suggested results
+#+end_src
+
+**** NSE script usage
+
+#+begin_src bash
+# 1. Find a script
+find /usr/share/nmap/scripts/ -name "*.nse" | grep smb
+
+# 2. Read what it does
+nmap --script-help smb-enum-shares
+
+# 3. Run it
+sudo nmap --script smb-enum-shares -p 445 $IP
+#+end_src
+
+*** Phase 4 - Vulnerability Detection
+
+/Goal: Identify exploitable attack surface./
+
+**** Search NSE Scripts by Category
+#+begin_src bash
+# List all vuln category scripts
+grep "\"vuln\"" /usr/share/nmap/scripts/script.db
+
+# Run all vuln scripts on a specific port (-sV is required)
+sudo nmap -sV -p 443 --script "vuln" -Pn $IP -oA scans/$IP-vuln-443
+#+end_src
+
+**** Target a specific CVE
+#+begin_src bash
+# 1. Search: "CVE-2021-41773 nse" → download script
+# 2. Copy to /usr/share/nmap/scripts/
+# 3. Update script database
+sudo nmap --script-updatedb
+
+# 4. Run
+sudo nmap -sV -p 443 --script "http-vuln-cve2021-41773" -Pn $IP
+#+end_src
+
+#+BEGIN_QUOTE
+*Exam tip:* Don't run --script vuln on all ports at once. It's slow and noisy. Run it on specific interesting ports after you know what's open.
+#+END_QUOTE
+
+*** Phase 5 - Scanning from Windows (Pivot Scenarios)
+
+/Goal: Use after initial access when you need to scan the internal network from a compromised Windows host/
+
+**** Single port check
+
+#+begin_src powershell
+Test-NetConnection -Port 445 192.168.1.10
+#+end_src
+
+**** Port range scan (simple, synchronous)
+
+#+begin_src powershell
+1..1024 | % {echo ((New-Object Net.Sockets.TcpClient).Connect("192.168.1.10", $_)) "TCP port $_ is open"} 2>$null
+#+end_src
+
+**** Port range scan (fast, async — save as `portscan.ps1`)
+#+begin_src powershell
+$RunspacePool = [runspacefactory]::CreateRunspacePool(1,100)
+$RunspacePool.Open()
+$PowerShell = [powershell]::Create()
+$PowerShell.RunspacePool = $RunspacePool
+$PowerShell.AddScript({
+	1..1000 | ForEach-Object {
+		if((New-Object System.Net.Sockets.TcpClient).ConnectAsync("192.168.1.10",$_).wait(100)){
+			write-output "Port $_ is open"
+		}
+	}
+})
+$Jobs = $PowerShell.BeginInvoke()
+$PowerShell.EndInvoke($Jobs)
+$PowerShell.Streams.Output
+#+end_src
+
+Execute like this:
+#+begin_src powershell
+powershell -ExecutionPolicy Bypass -File .\portscan.ps1
+#+end_src
+
+*** Phase 6 - Manual Scanning (No Tools Available)
+
+/Goal: Use when nmap/rustscan are not available or AV is blocking them./
+
+**** TCP
+
+#+begin_src bash
+nc -nvv -w 1 -z 192.168.50.152 3388-3390
+
+# -nvv: No DNS lookup, very verbose
+# -w 1: Timeout after 1 second
+# -z: Zero-I/O mode (scan mode)
+#+end_src
+
+**** UDP
+#+begin_src bash
+nc -nv -u -z -w 1 192.168.50.149 120-123
+
+# -u: Forces UDP mode (The CRITICAL flag here)
+# -z: Zero-I/O mode (scan mode)
+#+end_src
+
+#+BEGIN_QUOTE
+*UDP caveats:* High false positive rate. Firewalls drop ICMP responses. An "open|filtered" result means nmap couldn't confirm — probe manually with the specific protocol.
+#+END_QUOTE
+
+*** Exam Reminders
+
+- *Scan missing?* Add ~-Pn~ - the host is likely blocking pings.
+- *Scan too slow?* Use ~-T4~. Never use ~-T5~ (causes missed ports).
+- *Got a weird port?* Google ~port XXXXX exploit~ and check ~searchsploit~.
+- *Found a service version?* Run ~searchsploit <service> <version>~ immediately.
+- *Always save with `-oA`* — creates ~.nmap~, ~.gnmap~, and ~.xml~ simultaneously.
+- **UDP is not optional.** SNMP alone has caused many OSCP failures.
 
 ** Finding local exploits
 
@@ -40,14 +277,22 @@ searchsploit -t squirrelmail metasploit
 
 *** nmap NSE scripts
 
-Find exploits in NSE scripts
+**** Find NSE scripts
+
+#+begin_src bash
+find /usr/share/nmap/scripts/ -name "*.nse" | grep smb
+#+end_src
+
+**** Find exploits in NSE scripts
+
 #+begin_src bash
 grep Exploits /usr/share/nmap/scripts/*.nse
 
 /usr/share/nmap/scripts/clamav-exec.nse:Exploits ClamAV servers vulnerable to unauthenticated clamav comand execution.
 #+end_src
 
-Get help for NSE script
+**** Get help for NSE script
+
 #+begin_src bash
 nmap --script-help=clamav-exec.nse
 #+end_src
