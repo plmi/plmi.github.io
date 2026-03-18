@@ -7,9 +7,9 @@
 ** Network Scanning
 
 #+BEGIN_QUOTE
-*Rule:* Always save output. You will need it for the report and for grepping later.
-*Rule:* Always run UDP. SNMP, TFTP, IKE — you will miss them if you skip it.
-*Rule:* When a scan returns nothing, add `-Pn`. Firewall is dropping pings.
+- *Rule:* Always save output. You will need it for the report and for grepping later.
+- *Rule:* Always run UDP. SNMP, TFTP, IKE - you will miss them if you skip it.
+- *Rule:* When a scan returns nothing, add ~-Pn~. Firewall is dropping pings.
 #+END_QUOTE
 
 -----
@@ -36,7 +36,7 @@ sudo nmap -sV -p <PORT> --script vuln -Pn $IP -oA scans/$IP-vuln
 
 *** Phase 1 - Host Discovery
 
-*Goal:* Find live hosts before scanning ports.
+/Goal: Find live hosts before scanning ports./
 
 **** Network Sweep
 
@@ -123,14 +123,14 @@ sudo nmap -vv --reason -Pn -sV -sC --version-all -oN scans/_quick_tcp_nmap.txt $
 
 **** Aggressive Service Scan
 
-#+begin_src 
+#+begin_src bash
 sudo nmap -A $IP
 
 # equals to:
 sudo nmap -sS -sV -sC -T4 -O --traceroute 192.168.50.14
 #+end_src
 
-#+begin_src 
+#+begin_src bash
 sudo rustscan -u 5000 -b 1900 -t 4000 --tries 2 --scan-order serial -a $IP -- -A -sVC --script=safe,default,discovery,version,vuln | sudo tee rustscan-full-result
 #+end_src
 
