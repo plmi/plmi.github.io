@@ -4,6 +4,21 @@
 
 * Enumeration
 
+** Network Scanning
+
+*** Phase 2: Port Scanning
+
+/Goal: Find every open port. Completeness matters more than speed./
+
+**** TCP - Full Scan (Primary Tool)
+
+#+begin_src bash
+sudo nmap -sS -p- -T4 -Pn $IP -oA scans/$IP-tcp-full
+
+# rustscan (faster, pipe to nmap for service detection)
+rustscan -a $IP --ulimit 5000 -t 4000 --tries 2 --scan-order serial
+#+end_src
+
 ** Finding local exploits
 
 *** Searchsploit
