@@ -260,17 +260,20 @@ nc -nv -u -z -w 1 192.168.50.149 120-123
 
 *** Searchsploit
 
-Copy exploit to local directory
+**** Copy exploit to local directory
+
 #+begin_src bash
 searchsploit -m 44904
 #+end_src
 
-View exploit
+**** View exploit
+
 #+begin_src bash
 searchsploit -x 44904
 #+end_src
 
-Search just by title
+**** Search just by title
+
 #+begin_src bash
 searchsploit -t squirrelmail metasploit
 #+end_src
