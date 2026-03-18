@@ -256,8 +256,12 @@ nc -nv -u -z -w 1 192.168.50.149 120-123
 - *Always save with `-oA`* — creates ~.nmap~, ~.gnmap~, and ~.xml~ simultaneously.
 - **UDP is not optional.** SNMP alone has caused many OSCP failures.
 
-** Finding local exploits
+** Services
+*** 445 - SMB
+[[file:smb.org][SMB Cheatsheet]]
 
+
+** Finding local exploits
 *** Searchsploit
 
 **** Copy exploit to local directory

