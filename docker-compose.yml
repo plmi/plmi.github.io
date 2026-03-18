@@ -6,4 +6,9 @@ services:
     volumes:
       - .:/src
     working_dir: /src
+    # Set BLOG_STYLE to switch themes:
+    #   "clean"    — original minimal style
+    #   "tactical" — enhanced cheat sheet navigation (default)
+    environment:
+      - HUGO_PARAMS_STYLE=${BLOG_STYLE:-tactical}
     command: hugo server --bind 0.0.0.0 --buildDrafts --navigateToChanged

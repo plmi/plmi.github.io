@@ -17,6 +17,8 @@ theme = "lt"
 
 [params]
   description = "Whenever I find a grain of time between my occupations, I write."
+  # Style: "clean" (original minimal) or "tactical" (enhanced cheat sheet navigation)
+  style = "tactical"
 
 [[menus.main]]
   name = "whoami"

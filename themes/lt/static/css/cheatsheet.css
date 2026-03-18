@@ -1,0 +1,287 @@
+/* ==========================================================
+   Cheatsheet Enhancement Layer
+   Adds visual hierarchy, navigation aids, and section
+   structure on top of the base main.css theme.
+
+   Org heading mapping:
+     *    → h2  (top-level: "Enumeration")
+     **   → h3  (major sections: "Network Scanning")
+     ***  → h4  (sub-sections: "Phase 1 - Host Discovery")
+     **** → h5  (leaf: "Network Sweep", "ARP Sweep")
+   ========================================================== */
+
+/* --- Shared tokens (root-level so .toc and .back-to-top can access them) --- */
+:root {
+    --accent: #4e5192;
+    --accent-light: #e8e9f5;
+    --accent-faint: #f4f4fb;
+    --radius: 6px;
+}
+
+/* --- Tokens only used inside page content --- */
+.page-content {
+    --note-bg: #eef6ff;
+    --note-border: #3b82f6;
+    --section-gap: 2.5rem;
+}
+
+/* ---------------------------------------------------
+   Section structure
+   --------------------------------------------------- */
+
+/* h2: Top-level org heading (*) — page section title */
+.page-content h2 {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-top: var(--section-gap);
+    margin-bottom: 0.75rem;
+    padding: 0.6rem 0.85rem;
+    background: var(--accent);
+    color: #fff;
+    border-radius: var(--radius);
+    scroll-margin-top: 1rem;
+}
+
+/* h3: Major sections (**) — e.g. "Network Scanning" */
+.page-content h3 {
+    font-size: 1.25em;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 0.6rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--accent-light);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius);
+    color: #333;
+    scroll-margin-top: 1rem;
+}
+
+/* h4: Sub-sections (***) — e.g. "Phase 1 - Host Discovery" */
+.page-content h4 {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid var(--accent-light);
+    color: var(--accent);
+    scroll-margin-top: 1rem;
+}
+
+/* h5: Leaf headings (****) — e.g. "Network Sweep", "ARP Sweep" */
+.page-content h5 {
+    font-size: 1em;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.4rem;
+    padding-left: 0.6rem;
+    border-left: 3px solid #ccc;
+    color: #444;
+    scroll-margin-top: 1rem;
+}
+
+/* ---------------------------------------------------
+   Blockquotes — tips, rules, exam notes
+   --------------------------------------------------- */
+.page-content blockquote {
+    margin: 1.25rem 0;
+    padding: 0.75rem 1rem;
+    border-left: 4px solid var(--note-border);
+    background: var(--note-bg);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+.page-content blockquote p {
+    margin: 0.25rem 0;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* ---------------------------------------------------
+   Code blocks
+   --------------------------------------------------- */
+
+/* Override the base pre border with accent left-bar + rounded corners */
+.page-content pre {
+    border: 1px solid rgba(0,0,0,0.15) !important;
+    border-left: 4px solid var(--accent) !important;
+    border-radius: var(--radius);
+    margin: 1rem 0;
+}
+
+/* Bash comments — light grey so commands stand out */
+.page-content div.highlight code[data-lang="bash"] span[style*="616e87"],
+.page-content div.highlight code[data-lang="sh"] span[style*="616e87"],
+.page-content div.highlight code[data-lang="shell"] span[style*="616e87"] {
+    color: #999 !important;
+    font-style: normal !important;
+}
+
+/* Language badge — read data-lang from the <code> element */
+.page-content div.highlight code[data-lang] {
+    position: relative;
+}
+.page-content div.highlight code[data-lang]::after {
+    content: attr(data-lang);
+    position: absolute;
+    top: -1em;
+    right: 0;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.65rem;
+    font-family: var(--font-family);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.5);
+    border-radius: 0 0 0 var(--radius);
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------
+   Tables
+   --------------------------------------------------- */
+.page-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.25rem 0;
+    font-size: 0.95em;
+    border: 1px solid #d0d0d0;
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+.page-content th {
+    background: var(--accent-light);
+    font-weight: 600;
+    color: #333;
+    text-align: left;
+    border-bottom: 2px solid var(--accent);
+}
+.page-content th,
+.page-content td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e0e0e0;
+}
+.page-content tr:nth-child(even) {
+    background-color: var(--accent-faint);
+}
+.page-content tr:hover {
+    background-color: var(--accent-light);
+}
+
+/* ---------------------------------------------------
+   Inline code
+   --------------------------------------------------- */
+.page-content p > code,
+.page-content li > code,
+.page-content td > code {
+    background-color: #2d2d2d;
+    color: #e8e8e8;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.88em;
+}
+
+/* ---------------------------------------------------
+   Table of Contents — fixed left sidebar
+   Faded when idle, full opacity on hover
+   --------------------------------------------------- */
+.toc {
+    opacity: 0.35;
+    position: fixed;
+    top: 10%;
+    left: 0.5%;
+    white-space: nowrap;
+    max-width: 18%;
+    max-height: 80vh;
+    overflow-y: auto;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    background: rgba(255,255,248,0.97);
+    transition: opacity 0.2s ease;
+}
+.toc:hover {
+    opacity: 1;
+}
+.toc ul {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+}
+.toc ul ul {
+    padding-left: 0.75rem;
+}
+.toc li {
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    padding: 0.15em 0;
+}
+/* Top-level TOC items — bolder accent */
+.toc > nav > ul > li > a {
+    font-weight: 600;
+    color: var(--accent);
+}
+.toc > nav > ul > li > ul > li > a {
+    font-weight: 500;
+    color: var(--accent);
+}
+.toc a {
+    font-weight: normal;
+    color: #555;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+.toc a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+@media (max-width: 1200px) {
+    .toc { display: none; }
+}
+
+/* ---------------------------------------------------
+   Horizontal rules
+   --------------------------------------------------- */
+.page-content hr {
+    border: none;
+    border-top: 2px dashed #ddd;
+    margin: 2rem 0;
+}
+
+/* ---------------------------------------------------
+   Lists
+   --------------------------------------------------- */
+.page-content ul,
+.page-content ol {
+    padding-left: 1.5rem;
+}
+.page-content li {
+    margin-bottom: 0.3rem;
+}
+.page-content li strong {
+    color: #333;
+}
+
+
+/* ---------------------------------------------------
+   Smooth scrolling
+   --------------------------------------------------- */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ---------------------------------------------------
+   Print
+   --------------------------------------------------- */
+@media print {
+    .toc { display: none; }
+    .page-content h2, .page-content h3 {
+        break-after: avoid;
+    }
+    .page-content pre, .page-content blockquote, .page-content table {
+        break-inside: avoid;
+    }
+}
