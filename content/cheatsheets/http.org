@@ -1,0 +1,48 @@
+#+TITLE: http
+#+DATE: 2026-03-15
+#+AUTHOR: Michael Plankl
+
+* Technology Discovery
+Use tools like
+- [[https://www.wappalyzer.com/][Wappalyzer]]
+- [[https://github.com/urbanadventurer/WhatWeb][WhatWeb]]
+- Inspect file extensions in URL like ~.php~
+- Inspect source code
+- Inspect (non-standard) HTTP headers like ~Server:~ or ~X-Powered-By~
+- Inspect favicon in browser tab (e.g., XAMPP icon)
+  
+#+begin_src bash
+nmap --script http-enum -p 80 -sV $IP
+whatweb -a 3 http://$IP
+nikto -h http://$IP
+#+end_src
+
+* Content Discovery
+/Find accessible files and directories./
+
+Find accessible pages:
+- Check ~/robots.txt~
+- Check if website has a sitemap
+  
+** Find Extensions
+#+begin_src bash
+feroxbuster --url http://$IP --wordlist /usr/share/wordlists/index_pages.txt -t 10 --extensions asp,aspx,bat,c,cfm,cgi,css,com,dll,exe,hta,htm,html,inc,jhtml,js,jsa,json,jsp,log,mdb,nsf,pcap,php,php2,php3,php4,php5,php6,php7,phps,pht,phtml,pl,phar,rb,reg,sh,shtml,sql,swf,txt,xml
+#+end_src
+
+** Find Directories
+Brute-force directories like ~/???/index.php~ with wordlists e.g.,
+- ~SecLists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-small.txt~
+- ~SecLists/Discovery/Web-Content/raft-large-directories.txt~
+#+begin_src bash
+feroxbuster --url http://$IP --wordlist `fzf-wordlists` -t 10 --extensions html,php 
+feroxbuster --url http://$IP --wordlist `fzf-wordlists` -t 10 --extensions html,php --extract-links
+#+end_src
+
+** Find Files
+Brute-forcing single files (on before identified directories)
+- ~SecLists/Discovery/Web-Content/raft-medium-files.txt~
+#+begin_src bash
+feroxbuster --url http://$IP/IDENTIFIEDDIRECTORY --wordlist `fzf-wordlists` --extensions html,php
+
+gobuster dir -u 192.168.50.20 -w `fzf-wordlists` -t 5 -x html,php
+#+end_src
