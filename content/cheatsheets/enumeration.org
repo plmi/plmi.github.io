@@ -248,19 +248,16 @@ nc -nv -u -z -w 1 192.168.50.149 120-123
 #+END_QUOTE
 
 *** Exam Reminders
-
 - *Scan missing?* Add ~-Pn~ - the host is likely blocking pings.
 - *Scan too slow?* Use ~-T4~. Never use ~-T5~ (causes missed ports).
 - *Got a weird port?* Google ~port XXXXX exploit~ and check ~searchsploit~.
 - *Found a service version?* Run ~searchsploit <service> <version>~ immediately.
 - *Always save with `-oA`* — creates ~.nmap~, ~.gnmap~, and ~.xml~ simultaneously.
 - **UDP is not optional.** SNMP alone has caused many OSCP failures.
-
+  
 ** Services
-*** 445 - SMB
-[[file:smb.org][SMB Cheatsheet]]
-
-
+*** [[file:http.org][80 - HTTP]]
+*** [[file:smb.org][445 - SMB]]
 ** Finding local exploits
 *** Searchsploit
 
