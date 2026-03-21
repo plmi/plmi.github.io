@@ -55,7 +55,23 @@ netexec smb $IP -u 'guest' -p '' -M spider_plus
 nmblookup -A $IP
 nxc smb $IP
 #+end_src
+** Enumerate Users (RID Cycling)
+#+begin_src 
+nmap --script smb-enum-users.nse -p445 <host>
+impacket-samrdump <host>
+#+end_src
 
+/Can also enumerate Unix users on Linux hosts!/
+#+begin_src
+enum4linux-ng.py -R 100 $IP
+enum4linux -r $IP  
+#+end_src
+
+Brute force range
+#+begin_src bash
+lookupsid.py guest@$IP -no-pass
+netexec smb $IP -u guest -p '' --rid-brute
+#+end_src
 * Exploitation
 
 | Exploit         | Mechanism                             | Go-to Tool             |
