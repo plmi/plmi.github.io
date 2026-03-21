@@ -139,6 +139,20 @@ Note: requires ~(require 'org-tempo)` in config in Emacs 26+.
 | C-c C-l | Insert or edit link            |
 | C-c C-o | Open link at cursor            |
 
+** Images
+
+| Shortcut        | Action       |
+|-----------------+--------------|
+| ~[[./foo.png]]~ | Insert image |
+
+Insert images with caption
+#+begin_src text
+#+CAPTION: Your caption
+#+NAME: fig:yourimage
+#+ATTR_HTML: :width 900px
+[[./foo.png]]
+#+end_src
+
 ** Todo & Agenda
 
 | Key         | Action                                  |
