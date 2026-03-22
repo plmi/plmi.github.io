@@ -87,6 +87,15 @@ After killing a line move to the desired location and use ~C-y~ to paste it.
 | C-x C-b | List all open buffers                |
 | C-x k   | Kill (close) current buffer          |
 
+** Bookmarks
+
+| Key     | Action                        |
+|---------+-------------------------------|
+| C-x r m | Set bookmark for current file |
+| C-x r b | Jump to a bookmark            |
+| C-x r l | List all bookmarks            |
+| C-x r d | Delete a bookmark             |
+
 * Org Mode
 
 ** Structure templates (type then ~Tab~ to expand)
