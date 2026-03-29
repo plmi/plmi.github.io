@@ -1,0 +1,34 @@
+#+TITLE: MySQL
+#+DATE: 2026-03-30
+#+AUTHOR: Michael Plankl
+
+* Enumeration
+
+** Connect to MySQL instance
+
+#+begin_src bash
+mysql -u root -p'root' -h $IP -P 3306 --skip-ssl-verify-server-cert
+sqsh -U <username> -P <password> -S $IP:3306
+#+end_src
+
+** Enumerate
+
+| Description                 | Query                                                                      |
+|-----------------------------+----------------------------------------------------------------------------|
+| Version                     | ~SELECT version();~                                                        |
+| Current User                | ~SELECT system_version();~                                                 |
+| All Users                   | ~SELECT * FROM mysql.user;~                                                |
+| Databases                   | ~SHOW databases;~                                                          |
+| Tables of Database ~offsec~ | ~SELECT * FROM information_schema.tables WHERE table_schema = 'offsec'~    |
+| Passwords of specific user  | ~SELECT user, authentication_string FROM mysql.user WHERE user = 'offsec'~ |
+
+Use *\G* instead of *;* to format output for console e.g., ~SELECT version()\G~.
+
+* Exploitation
+
+** Brute force credentials
+
+#+begin_src bash
+hydra -L /SecLists/Usernames/top-usernames-shortlist.txt -P /SecLists/Passwords/Common-Credentials/darkweb2017_top-100.txt -e nsr -s 3306 mysql://$IP
+#+end_src
+

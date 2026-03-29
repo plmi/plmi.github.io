@@ -258,6 +258,7 @@ nc -nv -u -z -w 1 192.168.50.149 120-123
 ** Services
 *** [[file:http.org][80 - HTTP]]
 *** [[file:smb.org][445 - SMB]]
+*** [[file:mysql.org][3306 - MySQL]]
 ** Finding local exploits
 *** Searchsploit
 
