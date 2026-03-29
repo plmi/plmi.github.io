@@ -11,7 +11,11 @@ technical notes I can reference quickly during lab work and exam prep.
 
 ** Publication
 
-- [[https://dfrws.org/presentation/addressing-the-dataset-gap-problem-with-generative-ai-towards-llm-driven-forensic-scenarios-for-dataset-generation/][Addressing the Dataset Gap Problem with Generative AI: Towards LLM-Driven Forensic Scenarios for Dataset Generation]] — DFRWS EU 2026
+- [[https://www.sciencedirect.com/science/article/pii/S2666281726000107][Addressing the dataset gap problem with Generative AI: Towards LLM-driven forensic scenarios for dataset generation]]:w
+
+** Conference Talks
+
+- 25.03.2026: [[https://dfrws.org/eu-2026-program/][DFRWS EU 2026]] - [[https://dfrws.org/presentation/addressing-the-dataset-gap-problem-with-generative-ai-towards-llm-driven-forensic-scenarios-for-dataset-generation/][Addressing the Dataset Gap Problem with Generative AI: Towards LLM-driven Forensic Scenarios for Dataset Generation]]
 
 ** Profiles
 
