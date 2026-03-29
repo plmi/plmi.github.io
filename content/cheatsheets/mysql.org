@@ -31,4 +31,3 @@ Use *\G* instead of *;* to format output for console e.g., ~SELECT version()\G~.
 #+begin_src bash
 hydra -L /SecLists/Usernames/top-usernames-shortlist.txt -P /SecLists/Passwords/Common-Credentials/darkweb2017_top-100.txt -e nsr -s 3306 mysql://$IP
 #+end_src
-
