@@ -148,11 +148,14 @@ Note: requires ~(require 'org-tempo)` in config in Emacs 26+.
 | C-c C-l | Insert or edit link            |
 | C-c C-o | Open link at cursor            |
 
-** Images
+** Images / Commands
 
-| Shortcut        | Action       |
-|-----------------+--------------|
-| ~[[./foo.png]]~ | Insert image |
+| Shortcut        | Action                                          |
+|-----------------+-------------------------------------------------|
+| ~[[./foo.png]]~ | Insert image                                    |
+| C-c i s         | Insert latest image from ./screenshots (custom) |
+| C-c i i         | Insert image from clipboard (custom)            |
+| C-c i c         | Insert formatted command output (custom)        |
 
 Insert images with caption
 #+begin_src text
