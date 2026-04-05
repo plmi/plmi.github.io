@@ -194,6 +194,15 @@ Insert images with caption
 | C-c C-x C-o | Clock out                               |
 | C-c a       | Open the agenda dispatcher              |
 
+** :LOGBOOK: drawer
+| Key     | Action                                       |
+|---------+----------------------------------------------|
+| C-c C-z | Add note to TODO item (/Command JournaliZe/) |
+| C-c C-c | Save note in :LOGBOOK: drawer                |
+| C-c C-k | Cancel note                                  |
+
+Requires: ~(setq org-log-into-drawer t)~ or ~#+STARTUP: logdrawer~
+
 ** Export
 
 | Key         | Action                    |
