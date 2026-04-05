@@ -242,3 +242,28 @@ Requires: ~(setq org-log-into-drawer t)~ or ~#+STARTUP: logdrawer~
 | % m REGEX | Mark files matching a regex pattern                 |
 | W         | Runs ~browse-url-of-file~ and opens file in browser |
 
+* Magit
+
+| Key   | Action                                |
+|-------+---------------------------------------|
+| C-x g | Open Magit                            |
+| TAB   | Expland section or Diff selected file |
+| g     | Refresh Magit buffer                  |
+| j     | Move down                             |
+| k     | Move up                               |
+
+| Git                      | Magit |
+|--------------------------+-------|
+| git pull                 | F p   |
+| git fetch                | F f   |
+| git push                 | P p   |
+| git add <file>           | s     |
+| git add .                | S     |
+| Unstage selected file    | u     |
+| git commit               | c c   |
+| git checkout <branch>    | b b   |
+| git checkout -b          | b c   |
+| git log                  | l l   |
+| git log (current branch) | l b   |
+| git stash                | z z   |
+| git stash pop            | z p   |
