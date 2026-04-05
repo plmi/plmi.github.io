@@ -114,6 +114,24 @@ After killing a line move to the desired location and use ~C-y~ to paste it.
 
 Note: requires ~(require 'org-tempo)` in config in Emacs 26+.
 
+** yasnippet - Parameterized tempaltes
+
+| Shortcut           | Action                                                  |
+|--------------------+---------------------------------------------------------|
+| M-x yas-reload-all | Ensures snippets in ~~/.emacs.d/snippets~ are picked up |
+| imgcap             | Insert image caption (custom)                           |
+
+The default directory ~yasnippet~ is ~~/emacs.d/snippets/~ organized by mode name:
+#+begin_example
+  ~/.emacs.d/snippets/
+  ├── org-mode/
+  │   └── imgcap
+  ├── python-mode/
+  │   └── def
+  └── js-mode/
+      └── cl
+#+end_example
+
 ** Headings
 
 | Key           | Action                                    |
