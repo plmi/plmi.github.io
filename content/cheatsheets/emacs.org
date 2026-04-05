@@ -172,8 +172,9 @@ The default directory ~yasnippet~ is ~~/emacs.d/snippets/~ organized by mode nam
 |-----------------+-------------------------------------------------|
 | ~[[./foo.png]]~ | Insert image                                    |
 | C-c i s         | Insert latest image from ./screenshots (custom) |
-| C-c i i         | Insert image from clipboard (custom)            |
-| C-c i c         | Insert formatted command output (custom)        |
+| C-c i c         | Insert image from clipboard (custom)            |
+| C-c i t         | Insert formatted command output (custom)        |
+| C-c C-x C-v     | Toggle display of inline images                 |
 
 Insert images with caption
 #+begin_src text
