@@ -244,13 +244,15 @@ Requires: ~(setq org-log-into-drawer t)~ or ~#+STARTUP: logdrawer~
 
 * Magit
 
-| Key   | Action                                |
-|-------+---------------------------------------|
-| C-x g | Open Magit                            |
-| TAB   | Expland section or Diff selected file |
-| g     | Refresh Magit buffer                  |
-| j     | Move down                             |
-| k     | Move up                               |
+| Key     | Action                                |
+|---------+---------------------------------------|
+| C-x g   | Open Magit                            |
+| TAB     | Expland section or Diff selected file |
+| g       | Refresh Magit buffer                  |
+| j       | Move down                             |
+| k       | Move up                               |
+| q       | Exit Magit                            |
+| C-c C-c | Submit commit message                 |
 
 | Git                      | Magit |
 |--------------------------+-------|
