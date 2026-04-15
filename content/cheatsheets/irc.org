@@ -1,0 +1,59 @@
+#+TITLE: irc
+#+AUTHOR: Michael Plankl
+
+* IRC
+
+** Register
+#+begin_src bash
+/nick [name]
+/msg nickserv register [password] [email]
+#+end_src
+
+** Login
+#+begin_src bash
+/msg nickserv identify [password]
+#+end_src
+
+** Logout
+#+begin_src bash
+/msg nickserv logout
+#+end_src
+
+** Group Nick
+#+begin_src bash
+/nick [new_name]
+/msg NickServ group [old_nick] [password]
+#+end_src
+
+** List Grouped Nick
+#+begin_src bash
+/msg nickserv info [name]
+#+end_src
+
+* WeeChat
+
+** Add new server
+#+begin_src bash
+/server add znc-libera 10.255.0.1/6697 -tls
+
+/set irc.server.znc-libera.username "admin"
+/set irc.server.znc-libera.password "admin/LiberaChat:<znc_password>"
+#+end_src
+
+** Trust TLS certificate
+
+#+begin_src bash
+/set irc.servers.znc-libera.tls_verify off
+/set irc.servers.znc-libera.ssl_verify off
+#+end_src
+
+** Shortcuts
+
+| Action      | Description            |
+|-------------+------------------------|
+| =fn + Up=   | scroll up in buffer    |
+| =fn + Down= | scroll down in buffer  |
+| =f5=        | scroll down in channel |
+| =f6=        | scroll up in channel |
+
+* ZNC
