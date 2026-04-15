@@ -1,0 +1,8 @@
+#+TITLE: tmux
+#+AUTHOR: Michael Plankl
+
+| Action                     | Description                     |
+|----------------------------+---------------------------------|
+| =tmux new -s mysession=    | Start a new named tmux session. |
+| =tmux ls=                  | List existing tmux sessions.    |
+| =tmux attach -t mysession= | Attach to a named session.      |
