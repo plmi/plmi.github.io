@@ -15,7 +15,7 @@
 
 Build dependencies for APKLab
 #+begin_src bash
-  sudo apt install zipalign binfmt-support qemu-user-static temurin-22-jdk python3-pip
+sudo apt install zipalign binfmt-support qemu-user-static temurin-22-jdk python3-pip
 #+end_src
 
 ** Configure Burp
@@ -137,3 +137,4 @@ Press =...= in AVD manager and click /Cold Boot/.
 2. Install [[https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf][MagiskHidePropsConf]] using Magisk
 3. Run =adb shell= > =su= > =props= > Select =1= (Edit device fingerprint) and pick a one
 4. Select > =3= (Device simulation) > =s= (Device simulation) > =y= > e.g. =1,5,6=
+   
