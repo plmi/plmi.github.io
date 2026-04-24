@@ -1,4 +1,5 @@
 #+TITLE: android
+#+DATE: 2026-04-24
 #+AUTHOR: Michael Plankl
 
 * Setup
