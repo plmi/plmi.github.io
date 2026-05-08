@@ -54,6 +54,15 @@
 | =fn + Up=   | scroll up in buffer    |
 | =fn + Down= | scroll down in buffer  |
 | =f5=        | scroll down in channel |
-| =f6=        | scroll up in channel |
+| =f6=        | scroll up in channel   |
+
+** Use Blowfish Encryption
+
+Download [[https://github.com/freshprince/weechat-fish/blob/master/fish.py][fish.py]] (older version still use ECB).
+
+#+begin_src bash
+/script load /full/path/to/fish.py
+/blowkey exchange <nick>
+#+end_src
 
 * ZNC
