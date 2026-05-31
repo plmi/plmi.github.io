@@ -113,13 +113,18 @@ Right-side info column. Default in this config: =size=.
 
 * Shell & tasks
 
-| Key     | Action                          |
-|---------+---------------------------------|
-| =;=     | run shell command (no block)    |
-| =:=     | run shell command (block & wait) |
-| =w=     | task manager (running jobs)     |
-| =Tab=   | spot / preview file info        |
-| =q= / =Q= | quit / quit without writing cwd-file |
+| Key       | Action                                       |
+|-----------+----------------------------------------------|
+| =;=       | run shell command (no block)                 |
+| =:=       | run shell command (block & wait)             |
+| =!=       | drop to an interactive shell here (custom)   |
+| =C-t=     | new tmux window in current dir (custom)      |
+| =w=       | task manager (running jobs)                  |
+| =Tab=     | spot / preview file info                     |
+| =q= / =Q= | quit / quit without writing cwd-file         |
+
+Launch Yazi with the =y= shell wrapper (in =zsh/.functions=) to =cd= your shell
+into the last directory on quit.
 
 * Dependencies
 
