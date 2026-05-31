@@ -1,0 +1,139 @@
+#+TITLE: yazi
+#+DATE: 2026-05-31
+#+AUTHOR: Michael Plankl
+
+In-app help: =~= or =F1=. Keys below cover the built-in defaults plus this config's
+custom bindings.
+
+* Navigation
+
+| Key         | Action                                            |
+|-------------+---------------------------------------------------|
+| =h j k l=   | parent / down / up / enter (=l= = smart-enter)    |
+| =gg= / =G=  | top / bottom                                      |
+| =H= / =L=   | history back / forward                            |
+| =z=         | jump via zoxide (frecency)                        |
+| =Z=         | jump / find via fzf                               |
+| =C-u= / =C-d= | half page up / down                             |
+
+* Goto
+
+| Key  | Directory                  |
+|------+----------------------------|
+| =gh= | =~= (home, built-in)       |
+| =gc= | =~/.config= (built-in)     |
+| =gd= | =~/Downloads= (built-in)   |
+| =gp= | =~/projects=               |
+| =gD= | =~/dotfiles=               |
+| =ge= | =~/Desktop=                |
+| =go= | =~/Documents=              |
+| =gt= | =/tmp=                     |
+
+* Selection
+
+| Key       | Action                       |
+|-----------+------------------------------|
+| =Space=   | toggle selection, move down  |
+| =v= / =V= | visual select / unselect     |
+| =C-a=     | select all                   |
+| =C-r=     | invert selection             |
+| =Esc=     | clear selection / cancel     |
+
+* File operations
+
+| Key       | Action                                            |
+|-----------+---------------------------------------------------|
+| =o= / =Enter= | open (default app)                            |
+| =O=       | open interactively (choose app)                   |
+| =C-o=     | force open with default macOS app (custom)        |
+| =y= / =x= | yank (copy) / cut                                 |
+| =p= / =P= | paste / paste-overwrite (=p= = smart-paste)       |
+| =-= / =Y= / =X= | cancel the yank / cut state                 |
+| =d= / =D= | trash / delete permanently                        |
+| =a=       | create (end name with =/= to make a dir)          |
+| =r=       | rename                                            |
+| =cm=      | chmod on selection (plugin)                       |
+| =C-y=     | reveal in Finder (custom)                         |
+
+* Copy paths (=c= prefix)
+
+| Key  | Action                |
+|------+-----------------------|
+| =cc= | full path             |
+| =cd= | directory path        |
+| =cf= | filename              |
+| =cn= | filename without ext  |
+
+* Find / Filter / Search
+
+| Key        | Action                                       |
+|------------+----------------------------------------------|
+| =f=        | filter (built-in)                            |
+| =F=        | smart-filter: type to narrow, Enter to jump  |
+| =/= / =?=  | find forward / backward                      |
+| =n= / =N=  | next / prev match                            |
+| =s=        | search filenames with fd                     |
+| =S=        | search file contents with ripgrep            |
+
+* Sort (=,= prefix)
+
+| Key  | Action            |
+|------+-------------------|
+| =,n= | natural           |
+| =,a= | alphabetical      |
+| =,s= | size              |
+| =,m= | mtime             |
+| =,b= | btime             |
+| =,e= | extension         |
+| =,r= | random            |
+| =,A= | toggle reverse    |
+
+* Linemode (=m= prefix)
+
+Right-side info column. Default in this config: =size=.
+
+| Key  | Action       |
+|------+--------------|
+| =ms= | size         |
+| =mm= | mtime        |
+| =mb= | btime        |
+| =mp= | permissions  |
+| =mo= | owner        |
+| =mn= | none         |
+
+* Tabs
+
+| Key       | Action               |
+|-----------+----------------------|
+| =t=       | new tab (at CWD)     |
+| =1= - =9= | switch to tab N      |
+| =[= / =]= | previous / next tab  |
+| ={= / =}= | swap tab left / right |
+| =C-c=     | close tab            |
+
+* Shell & tasks
+
+| Key     | Action                          |
+|---------+---------------------------------|
+| =;=     | run shell command (no block)    |
+| =:=     | run shell command (block & wait) |
+| =w=     | task manager (running jobs)     |
+| =Tab=   | spot / preview file info        |
+| =q= / =Q= | quit / quit without writing cwd-file |
+
+* Dependencies
+
+Powering the bindings above:
+=zoxide=, =fzf=, =fd=, =ripgrep=, =bat=, =poppler= (PDF preview),
+=ffmpegthumbnailer= (video thumbnails).
+
+* Plugins
+
+Managed by =ya pkg= (see =package.toml=): =full-border=, =smart-filter=,
+=git= (status signs), =chmod=.
+
+| Command          | Action            |
+|------------------+-------------------|
+| =ya pkg list=    | list installed    |
+| =ya pkg upgrade= | update all        |
+| =ya pkg add=     | add a plugin      |
