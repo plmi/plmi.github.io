@@ -3,57 +3,83 @@
 #+AUTHOR: Michael Plankl
 
 In-app help: =~= or =F1=. Keys below cover the built-in defaults plus this config's
-custom bindings.
+custom bindings. Checked against Yazi 26.9.1.
 
 * Navigation
 
-| Key         | Action                                            |
-|-------------+---------------------------------------------------|
-| =h j k l=   | parent / down / up / enter (=l= = smart-enter)    |
-| =gg= / =G=  | top / bottom                                      |
-| =H= / =L=   | history back / forward                            |
-| =z=         | jump via zoxide (frecency)                        |
-| =Z=         | jump / find via fzf                               |
+| Key           | Action                                          |
+|---------------+-------------------------------------------------|
+| =h j k l=     | parent / down / up / enter (=l= = smart-enter)  |
+| =gg= / =G=    | top / bottom                                    |
+| =H= / =L=     | history back / forward                          |
+| =z=           | jump / find via fzf                             |
+| =Z=           | jump via zoxide (frecency)                      |
 | =C-u= / =C-d= | half page up / down                             |
+| =C-b= / =C-f= | full page up / down                             |
+| =.=           | toggle hidden files                             |
 
 * Goto
 
-| Key  | Directory                  |
-|------+----------------------------|
-| =gh= | =~= (home, built-in)       |
-| =gc= | =~/.config= (built-in)     |
-| =gd= | =~/Downloads= (built-in)   |
-| =gp= | =~/projects=               |
-| =gD= | =~/dotfiles=               |
-| =ge= | =~/Desktop=                |
-| =go= | =~/Documents=              |
-| =gt= | =/tmp=                     |
+| Key        | Directory                                     |
+|------------+-----------------------------------------------|
+| =gh=       | =~= (home, built-in)                          |
+| =gc=       | =~/.config= (built-in)                        |
+| =gd=       | =~/Downloads= (built-in)                      |
+| =g Space=  | type a path to jump to (built-in)             |
+| =gf=       | follow hovered symlink (built-in)             |
+| =gp=       | =~/projects=                                  |
+| =gD=       | =~/dotfiles=                                  |
+| =ge=       | =~/Desktop=                                   |
+| =go=       | =~/Documents=                                 |
+| =gt=       | =/tmp= (overrides built-in =gt= = trash bin)  |
 
 * Selection
 
-| Key       | Action                       |
-|-----------+------------------------------|
-| =Space=   | toggle selection, move down  |
-| =v= / =V= | visual select / unselect     |
-| =C-a=     | select all                   |
-| =C-r=     | invert selection             |
-| =Esc=     | clear selection / cancel     |
+| Key       | Action                                |
+|-----------+---------------------------------------|
+| =Space=   | toggle selection, move down           |
+| =v= / =V= | visual select / unselect (range)      |
+| =C-a=     | select all (only visible if filtered) |
+| =C-r=     | invert selection                      |
+| =Esc=     | clear selection / exit visual mode    |
+
+Select by pattern: =f= filter, type a regex (e.g. =\.r\d\d$=), =Enter=, =C-a=,
+then =Esc= to clear the filter -- the selection stays.
 
 * File operations
 
-| Key       | Action                                            |
-|-----------+---------------------------------------------------|
-| =o= / =Enter= | open (default app)                            |
-| =O=       | open interactively (choose app)                   |
-| =C-o=     | force open with default macOS app (custom)        |
-| =y= / =x= | yank (copy) / cut                                 |
-| =p= / =P= | paste / paste-overwrite (=p= = smart-paste)       |
-| =-= / =Y= / =X= | cancel the yank / cut state                 |
-| =d= / =D= | trash / delete permanently                        |
-| =a=       | create (end name with =/= to make a dir)          |
-| =r=       | rename                                            |
-| =cm=      | chmod on selection (plugin)                       |
-| =C-y=     | reveal in Finder (custom)                         |
+| Key             | Action                                              |
+|-----------------+-----------------------------------------------------|
+| =Enter= / =l=   | enter dir or open file (smart-enter, custom)        |
+| =o=             | open (default opener)                               |
+| =O= / =S-Enter= | open interactively (choose opener, e.g. extract)    |
+| =C-o=           | force open with default macOS app (custom)          |
+| =y= / =x=       | yank (copy) / cut                                   |
+| =p=             | paste; into hovered dir if on a dir (smart-paste)   |
+| =P=             | paste-overwrite                                     |
+| =Y= / =X=       | cancel the yank / cut state                         |
+| =-= / =_=       | symlink yanked files (absolute / relative)          |
+| =C--=           | hardlink yanked files                               |
+| =d= / =D=       | trash / delete permanently (both ask to confirm)    |
+| =a=             | create (end name with =/= to make a dir: =foo/bar/=) |
+| =A=             | bulk create                                         |
+| =r=             | rename                                              |
+| =cm=            | chmod on selection (plugin)                         |
+| =C-y=           | reveal in Finder (custom)                           |
+
+* Archives
+
+| Key            | Action                                                 |
+|----------------+--------------------------------------------------------|
+| =Enter= on =.rar= | extract with =unar= (custom opener)                 |
+| =Enter= on zip/7z/tar... | extract with built-in =extract= plugin (=7zz=) |
+| =O=            | pick "Extract here" explicitly                         |
+
+- Split RARs (=.rar= + =.r00=, =.r01= ...): hover the =.rar=, the rest is found
+  automatically.
+- Homebrew's =7zz= / =7z= ship *without* the RAR codec: lists fine, extracting fails
+  with =Unsupported Method= and leaves a 0-byte file. Hence the =unar= opener.
+- Single-file archives extract straight into the current dir (no subfolder).
 
 * Copy paths (=c= prefix)
 
@@ -63,30 +89,34 @@ custom bindings.
 | =cd= | directory path        |
 | =cf= | filename              |
 | =cn= | filename without ext  |
+| =cC= | file URL              |
+| =cD= | directory URL         |
 
 * Find / Filter / Search
 
-| Key        | Action                                       |
-|------------+----------------------------------------------|
-| =f=        | filter (built-in)                            |
-| =F=        | smart-filter: type to narrow, Enter to jump  |
-| =/= / =?=  | find forward / backward                      |
-| =n= / =N=  | next / prev match                            |
-| =s=        | search filenames with fd                     |
-| =S=        | search file contents with ripgrep            |
+| Key        | Action                                        |
+|------------+-----------------------------------------------|
+| =f=        | filter (built-in, regex, hides non-matches)   |
+| =F=        | smart-filter: type to narrow, Enter to jump   |
+| =/= / =?=  | find forward / backward (regex, no hiding)    |
+| =n= / =N=  | next / prev match                             |
+| =s=        | search filenames with fd                      |
+| =S=        | search file contents with ripgrep             |
+| =C-s=      | cancel running search                         |
 
 * Sort (=,= prefix)
 
-| Key  | Action            |
-|------+-------------------|
-| =,n= | natural           |
-| =,a= | alphabetical      |
-| =,s= | size              |
-| =,m= | mtime             |
-| =,b= | btime             |
-| =,e= | extension         |
-| =,r= | random            |
-| =,A= | toggle reverse    |
+Uppercase = same sort, reversed (=,M= =,B= =,E= =,A= =,N= =,S=).
+
+| Key  | Action                              |
+|------+-------------------------------------|
+| =,n= | natural                             |
+| =,a= | alphabetical                        |
+| =,s= | size (also switches linemode)       |
+| =,m= | mtime (also switches linemode)      |
+| =,b= | btime (also switches linemode)      |
+| =,e= | extension                           |
+| =,r= | random                              |
 
 * Linemode (=m= prefix)
 
@@ -103,13 +133,16 @@ Right-side info column. Default in this config: =size=.
 
 * Tabs
 
-| Key       | Action               |
-|-----------+----------------------|
-| =t=       | new tab (at CWD)     |
-| =1= - =9= | switch to tab N      |
-| =[= / =]= | previous / next tab  |
-| ={= / =}= | swap tab left / right |
-| =C-c=     | close tab            |
+Max 9 tabs. Copy between tabs: =y= / =x=, switch tab, =p=.
+
+| Key       | Action                              |
+|-----------+-------------------------------------|
+| =tt=      | new tab (at CWD) -- was =t= before   |
+| =tr=      | rename current tab                  |
+| =1= - =9= | switch to tab N                     |
+| =[= / =]= | previous / next tab                 |
+| ={= / =}= | swap tab left / right               |
+| =C-c=     | close tab (quits if it's the last)  |
 
 * Shell & tasks
 
@@ -119,26 +152,62 @@ Right-side info column. Default in this config: =size=.
 | =:=       | run shell command (block & wait)             |
 | =!=       | drop to an interactive shell here (custom)   |
 | =C-t=     | new tmux window in current dir (custom)      |
-| =w=       | task manager (running jobs)                  |
 | =Tab=     | spot / preview file info                     |
+| =C-z=     | suspend yazi (=fg= to return)                |
 | =q= / =Q= | quit / quit without writing cwd-file         |
 
 Launch Yazi with the =y= shell wrapper (in =zsh/.functions=) to =cd= your shell
 into the last directory on quit.
 
+** Task manager
+
+Status bar "=N left=" = N tasks still queued/running (copy, extract, ...). No
+"done" message on success -- the counter disappears; errors pop up.
+
+| Key            | Action                      |
+|----------------+-----------------------------|
+| =w=            | open task manager           |
+| =j= / =k=      | move between tasks          |
+| =Enter=        | inspect task output         |
+| =x=            | cancel task                 |
+| =w= / =Esc=    | close                       |
+
+* Config gotchas (Yazi 26)
+
+- Opener placeholders: =%s= (all selected, auto-quoted) and =%s1= (first file).
+  The old shell style ="$@"= / ="$1"= expands to nothing -> "Process exited with
+  exit code 1".
+- Open rules match with =url = "*.rar"= -- the old =name= key fails with
+  "at least one of `url` or `mime` must be specified".
+- Config isn't reloaded live: quit and restart after editing.
+
+Example (=yazi.toml=, the =unar= opener used above):
+
+#+begin_src toml
+[opener]
+unar = [{ run = 'unar -f %s1', desc = "Extract (unar)", block = true }]
+
+[open]
+prepend_rules = [{ url = "*.rar", use = ["unar", "reveal"] }]
+#+end_src
+
 * Dependencies
 
 Powering the bindings above:
 =zoxide=, =fzf=, =fd=, =ripgrep=, =bat=, =poppler= (PDF preview),
-=ffmpegthumbnailer= (video thumbnails).
+=ffmpegthumbnailer= (video thumbnails), =sevenzip= (archive preview / extract),
+=unar= (RAR extract).
 
 * Plugins
 
 Managed by =ya pkg= (see =package.toml=): =full-border=, =smart-filter=,
+=smart-enter=, =smart-paste=,
 =git= (status signs), =chmod=.
 
-| Command          | Action            |
-|------------------+-------------------|
-| =ya pkg list=    | list installed    |
-| =ya pkg upgrade= | update all        |
-| =ya pkg add=     | add a plugin      |
+| Command           | Action                          |
+|-------------------+---------------------------------|
+| =ya pkg list=     | list installed                  |
+| =ya pkg upgrade=  | update all                      |
+| =ya pkg add=      | add a plugin                    |
+| =ya pkg install=  | install all from =package.toml= |
+| =ya pkg delete=   | remove a plugin                 |
