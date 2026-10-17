@@ -15,6 +15,10 @@ theme = "lt"
 [pagination]
   pagerSize = 10
 
+# Hugo >= 0.16x blocks text/org content by default; CI uses hugo-version: latest
+[security]
+  allowContent = ['! ^text/html$']
+
 [params]
   description = "Whenever I find a grain of time between my occupations, I write."
   # Style: "clean" (original minimal) or "tactical" (enhanced cheat sheet navigation)
