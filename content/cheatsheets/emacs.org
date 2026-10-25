@@ -195,6 +195,13 @@ Insert images with caption
 | C-c C-x C-o | Clock out                               |
 | C-c a       | Open the agenda dispatcher              |
 
+*** Agenda filters
+
+Open the global TODO list with ~C-c a t~, then use:
+
+- ~/~: Filter entries, e.g. ~+bitshift~ to show only that tag or ~-paper~ to exclude it. Confirm with ~RET~.
+- ~|~: Remove all filters and show the full list again.
+
 ** :LOGBOOK: drawer
 | Key     | Action                                       |
 |---------+----------------------------------------------|
