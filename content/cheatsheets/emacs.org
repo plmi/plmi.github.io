@@ -2,60 +2,15 @@
 #+DATE: 2026-03-15
 #+AUTHOR: Michael Plankl
 
-* Navigation
-
-** Cursor Movement
-
-| Key       | Action                      |
-|-----------+-----------------------------|
-| C-f / C-b | Forward / backward one char |
-| M-f / M-b | Forward / backward one word |
-| C-a / C-e | Line start / end            |
-
-** Jump to position
-
-| Key   | Action                       |
-|-------+------------------------------|
-| M-<   | Jump to beginning of buffer  |
-| M->   | Jump to end of buffer        |
-| M-g g | Jump to specific line number |
-
 * Editing
 
-** Cut / Copy / Paste
+Navigation and editing use evil (Vim) keys.
 
-| Key     | Action                              |
-|---------+-------------------------------------|
-| C-w     | Cut (kill) region                   |
-| M-w     | Copy (kill-ring-save)               |
-| C-y     | Paste (yank)                        |
-| M-y     | Cycle through earlier kills         |
-| M-d     | Delete word forward (like Vim ~cw~) |
-| S-Mouse | Select text in termal mode          |
+| Key     | Action                        |
+|---------+-------------------------------|
+| S-Mouse | Select text in terminal mode  |
 
-** Setting the mark (selecting text)
-
-| Key           | Action                       |
-|---------------+------------------------------|
-| C-Space / C-@ | Set start of mark            |
-| C-g           | Cancel / deactivate the mark |
-
-** Kill (delete) line
-
-| Key                 | Action                            |
-|---------------------+-----------------------------------|
-| C-a C-k C-k         | Delete whole line (like Vim ~dd~) |
-| C-k                 | Kill from cursor to end of line   |
-| M-x kill-whole-line | Delete entire line at cursor      |
-
-After killing a line move to the desired location and use ~C-y~ to paste it.
-
-** Undo / redo
-
-| Key | Action              |
-|-----+---------------------|
-| C-/ | Undo last operation |
-| C-? | Redo last operation |
+Redo with ~C-r~ requires ~(setq evil-undo-system 'undo-redo)~ before ~(evil-mode 1)~.
 
 * Window Management
 # Emacs terminology: Frame = OS window, Window = split pane, Buffer = file/content
@@ -237,17 +192,24 @@ Requires: ~(setq org-log-into-drawer t)~ or ~#+STARTUP: logdrawer~
 |-----------+-----------------------------------------------------|
 | +         | Create a new directory                              |
 | C-x C-f   | Create a new file (open for editing)                |
-| m         | Mark a file                                         |
+| m         | Mark a file (~*~)                                   |
 | t         | Toggle mark (invert selection)                      |
 | u         | Unmark a file                                       |
 | U         | Unmark all files                                    |
-| d         | Mark file(s) for deletion                           |
+| d         | Flag file for deletion (~D~)                        |
+| x         | Delete files flagged with ~d~                       |
+| D         | Delete marked (~*~) files, or file at cursor        |
 | C         | Copy marked file(s)                                 |
-| D         | Delete file immediately (no mark required)          |
 | R         | Rename / move a file                                |
-| x         | Execute deletion (confirm marked file(s))           |
 | % m REGEX | Mark files matching a regex pattern                 |
-| W         | Runs ~browse-url-of-file~ and opens file in browser |
+| g r       | Refresh Dired buffer                                |
+| g x       | Runs ~browse-url-of-file~ and opens file in browser |
+
+~x~ only acts on ~d~ flags. If it says /No deletion requested/, the files are marked with ~m~, so use ~D~ instead.
+
+*** Delete everything except one file
+
+~U~ (clear marks) → ~t~ (mark all) → move to the file to keep → ~u~ → ~D~ → confirm
 
 * Magit
 
@@ -277,3 +239,21 @@ Requires: ~(setq org-log-into-drawer t)~ or ~#+STARTUP: logdrawer~
 | git log (current branch) | l b   |
 | git stash                | z z   |
 | git stash pop            | z p   |
+
+* Python & Compilation
+
+| Key / Command | Action                                     |
+|---------------+--------------------------------------------|
+| M-x compile   | Run a shell command, e.g. ~python3 foo.py~ |
+| M-x recompile | Rerun last compile command                 |
+| C-c C-p       | Start Python REPL                          |
+| C-c C-c       | Send Python buffer to REPL                 |
+| C-c C-r       | Send selected region to REPL               |
+
+Bind ~F5~ to recompile and enable ANSI colors in compilation output (~init.el~):
+#+begin_src emacs-lisp
+(global-set-key (kbd "<f5>") #'recompile)
+
+(require 'ansi-color)
+(add-hook 'compilation-filter-hook #'ansi-color-compilation-filter)
+#+end_src
