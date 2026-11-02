@@ -153,43 +153,7 @@ program input.
 | =x/32wx $esp=    | 32 four-byte stack entries, in hexadecimal    |
 | =bt=            | call stack, e.g. =func= called by =main=       |
 
-* Where Are buf & arg1?
-
-The assembly established the locations in this particular function:
-
-#+begin_src asm
-lea eax, [ebp-0x2c]                 ; &buf, passed to gets
-push eax
-call gets
-add esp, 0x10
-cmp dword ptr [ebp+0x8], 0xcafebabe ; arg1
-#+end_src
-
-With =ebp = 0xffffdde8= at the stop shown below:
-
-| Variable | Frame-relative location | Address       |
-|----------+-------------------------+---------------|
-| =buf=    | =ebp - 0x2c=           | =0xffffddbc= |
-| =arg1=   | =ebp + 0x8=            | =0xffffddf0= |
-
-=buf= contains =AAAABBBBCCCCDDD=; the value of =arg1= is =0xdeadbeef=.
-
-#+CAPTION: buf starts at the first 41 byte in row ffffddb8, at offset +4. arg1 is ef be ad de at ffffddf0.
-#+ATTR_HTML: :alt Decompiled func beside stack memory showing the input buffer and arg1
-[[./images/stack-buf-arg1.png]]
-
-ASCII =A= is =41=, =B= is =42=, =C= is =43=, and =D= is =44=. On little-endian
-x86, =ef be ad de= represents =0xdeadbeef=.
-
-Inspect the locations in the Debugger console:
-
-#+begin_src text
-x/32bx $ebp-0x2c
-x/1wx $ebp+8
-#+end_src
-
-The absolute addresses belong to this run; the offsets were verified in this
-function's assembly. Do not assume them for another function or binary.
+* Stack Variables: Automatic Annotations
 
 ** Automatic Stack Variable Annotations
 
@@ -202,7 +166,58 @@ function's assembly. Do not assume them for another function or binary.
 
 Annotations are generated automatically when the target stops; there is no
 separate annotate command. At least two stack frames must be available.
-The screenshot above shows the manual mapping before automatic labels.
+
+#+CAPTION: Automatic labels in Linear view beside func. In this screenshot the buf and arg1 labels are four bytes before their assembly-verified locations.
+#+ATTR_HTML: :alt Binary Ninja automatically annotated stack with buf, arg1, saved registers, and a frame marker
+[[./images/stack-variable-annotations.png]]
+
+** Read buf & arg1 in This Screenshot
+
+The left pane is paused at the =if= after =gets=. The right pane now has names
+and types such as =char buf[0x20]=, =arg1=, saved registers, and =Frame #0=.
+
+*The automatic labels need verification.* In this screenshot they are shifted
+four bytes toward lower addresses compared with the layout checked in this
+session:
+
+| Variable | Automatic label | Verified address |
+|----------+-----------------+------------------|
+| =buf=    | =0xffffddb8=   | =0xffffddbc=    |
+| =arg1=   | =0xffffddec=   | =0xffffddf0=    |
+
+- The rendered =buf= starts with four =\x00= bytes before =AAAABBBBCCCCDDD=.
+  The actual input begins four bytes after that label, at =0xffffddbc=.
+- The label =arg1= shows =0x565562c5= at =0xffffddec=. That is the return
+  address after the call to =func=, not the =0xdeadbeef= passed by =main=.
+- At =0xffffddf0=, the raw bytes =ef be ad de= are visible. On little-endian
+  x86 they represent =0xdeadbeef=, the argument used by the comparison.
+
+The assembly is the check for the labels:
+
+#+begin_src asm
+lea eax, [ebp-0x2c]                 ; &buf, passed to gets
+push eax
+call gets
+add esp, 0x10
+cmp dword ptr [ebp+0x8], 0xcafebabe ; arg1
+#+end_src
+
+With the frame pointer =ebp = 0xffffdde8= verified in this session:
+
+- =buf= is at =ebp - 0x2c = 0xffffddbc= and holds 32 bytes.
+- =arg1= is at =ebp + 0x8 = 0xffffddf0= and holds =0xdeadbeef=.
+
+Inspect those locations in the *Debugger* console:
+
+#+begin_src text
+x/32bx $ebp-0x2c
+x/1wx $ebp+8
+#+end_src
+
+Use the automatic annotations to orient yourself, then confirm the addresses
+against the instructions and raw bytes when a label or value does not match.
+These absolute addresses belong to this run, and these offsets belong to this
+function; they are not a general x86 stack layout.
 
 * Calculate an Address Difference
 
