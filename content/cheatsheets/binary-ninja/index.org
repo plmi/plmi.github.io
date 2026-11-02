@@ -1,0 +1,228 @@
+#+TITLE: binary ninja
+#+DATE: 2026-11-02
+#+AUTHOR: Michael Plankl
+#+IMAGE_SAVE_DIR: content/cheatsheets/binary-ninja/images/
+
+Notes from a debugging session with Binary Ninja Free 6.0.10905 on an M4 Pro
+MacBook and a 32-bit x86 Linux executable (=bof=). The target ran on an x86-64
+Debian VPS. These are the setup steps, problems, and solutions from that session.
+
+* Remote Debugging: Which Method?
+
+Use *Linux Remote Debugging (Using Debug Server)* with the *LLDB* adapter.
+Choose the platform based on the target: =remote-linux=, even though Binary
+Ninja runs on macOS. The VPS executes the program; the Mac runs the debugger UI.
+
+From the directory containing the bundled Linux =lldb-server=, run on the VPS:
+
+#+begin_src bash
+mkdir -p ~/bn-debug
+realpath ~/bn-debug
+
+./lldb-server platform --server \
+  --listen 0.0.0.0:31337 \
+  --gdbserver-port 31338
+#+end_src
+
+Leave the server running. Keep the debugger reachable through a private/VPN
+network or restrict access to the Mac. This setup uses two ports: =31337= for
+the platform connection and =31338= for the process connection.
+
+** Which IP Address Field?
+
+Open the binary locally, then choose =Debugger > Connect to Debug Server=.
+In Debug Adapter Settings, use the *debugServer* section:
+
+| Setting                       | Value                          |
+|-------------------------------+--------------------------------|
+| Debug adapter                 | =LLDB=                         |
+| =debugServer > IP Address=     | reachable IP address of the VPS |
+| =debugServer > Port=           | =31337=                        |
+| =debugServer > Platform=       | =remote-linux=                 |
+
+The =connect= section is for the separate /Connect to Remote Process/ method.
+Changing its IP field does not configure the debug-server connection.
+
+** The Binary Exists Only on the Mac
+
+LLDB can upload it automatically:
+
+| Setting                              | Value                           |
+|--------------------------------------+---------------------------------|
+| =debugServer > Disable Auto Install=  | unchecked                       |
+| =launch > Executable Path=            | local path on the Mac           |
+| =launch > Working Directory=          | absolute directory on the VPS   |
+
+Keep =Input File= pointing to the local binary too. Set auto-install *before
+connecting*; disconnect and reconnect if already connected. The working
+directory must exist on the VPS. Use the path printed by =realpath ~/bn-debug=.
+
+After connecting, set a breakpoint and click Launch. LLDB uploads the executable
+and runs it remotely.
+
+* Troubleshooting: Launch
+
+** Warning Says "on Your Machine"
+
+The launch confirmation showed a local =/Users/.../bof= path and said the binary
+would run "on your machine". The LLDB adapter can display this wording even for
+a remote launch. The message alone does not identify the execution host.
+
+Make sure /Connect to Debug Server/ succeeded in the current session before
+confirming. A local executable path is expected when using automatic upload.
+
+** Launch Stays at 0%
+
+#+CAPTION: Launch was stuck at this dialog. The percentage alone did not explain the cause.
+#+ATTR_HTML: :alt Binary Ninja launch progress dialog stuck at zero percent
+[[./images/launch-stuck.png]]
+
+A stack sample caught Binary Ninja's UI thread blocked on a lock while the VPS
+connection still existed. Testing separately with the bundled LLDB revealed a
+concrete launch failure:
+
+#+begin_example
+Cannot launch '/home/user/bn-debug/bof':
+execve failed: No such file or directory
+#+end_example
+
+The executable had uploaded successfully. The missing file was its *32-bit
+Linux loader*, =/lib/ld-linux.so.2=.
+
+** Install the Missing 32-bit Runtime
+
+On the Debian x86-64 VPS:
+
+#+begin_src bash
+sudo apt update
+sudo apt install libc6-i386
+ldd ~/bn-debug/bof
+#+end_src
+
+After installation, the executable ran and =ldd= resolved =libc.so.6= through
+=/lib32/libc.so.6= and the loader through =/lib/ld-linux.so.2=.
+
+Restart Binary Ninja if it is still unresponsive, reconnect to the debug server,
+and launch again. The missing runtime was a confirmed launch blocker; it did
+not prove the cause of the UI lock. Later, a failed connection also required
+starting =lldb-server= again.
+
+* Troubleshooting: gets Waits for Input
+
+The program printed =overflow me := and waited inside =gets=. Entering
+=AAAABBBBCCCCDDD= in the Target console did not reach the next breakpoint.
+Sending a newline through that console did not resolve it either.
+
+#+CAPTION: The target was running, but input in the Target console did not release gets in this session.
+#+ATTR_HTML: :alt Binary Ninja Target console with input while execution waits inside gets
+[[./images/target-input-waiting.png]]
+
+The working workaround was *stdin redirection from a file on the VPS*.
+
+Run this in the *VPS SSH terminal*:
+
+#+begin_src bash
+printf '%s\n' 'AAAABBBBCCCCDDD' > ~/bn-debug/input.txt
+realpath ~/bn-debug/input.txt
+#+end_src
+
+Set =Debug Adapter Settings > launch > Redirect stdin= to the absolute *VPS*
+path, e.g. =/home/user/bn-debug/input.txt=. Restart the target and continue
+through the breakpoints. Execution then reached the =if= after =gets=.
+
+- =gets= finishes on a newline or EOF.
+- Command-line arguments do not provide stdin.
+- The file supplies the actual input bytes; typing a literal =\n= does not send
+  a newline byte.
+- Edit the file and restart the target to test another input.
+
+This was a working workaround for this session, not a diagnosis of every
+remote Target-console input problem.
+
+* View the Stack
+
+While paused, choose =Debugger > Create Stack View=. It opens a second pane at
+the stack pointer. Use Linear view for variable labels or Hex view for bytes
+and ASCII.
+
+The *Debugger* console accepts LLDB commands; the *Target* console is for
+program input.
+
+| Debugger command | What it shows                                 |
+|------------------+-----------------------------------------------|
+| =x/32wx $esp=    | 32 four-byte stack entries, in hexadecimal    |
+| =bt=            | call stack, e.g. =func= called by =main=       |
+
+* Where Are buf & arg1?
+
+The assembly established the locations in this particular function:
+
+#+begin_src asm
+lea eax, [ebp-0x2c]                 ; &buf, passed to gets
+push eax
+call gets
+add esp, 0x10
+cmp dword ptr [ebp+0x8], 0xcafebabe ; arg1
+#+end_src
+
+With =ebp = 0xffffdde8= at the stop shown below:
+
+| Variable | Frame-relative location | Address       |
+|----------+-------------------------+---------------|
+| =buf=    | =ebp - 0x2c=           | =0xffffddbc= |
+| =arg1=   | =ebp + 0x8=            | =0xffffddf0= |
+
+=buf= contains =AAAABBBBCCCCDDD=; the value of =arg1= is =0xdeadbeef=.
+
+#+CAPTION: buf starts at the first 41 byte in row ffffddb8, at offset +4. arg1 is ef be ad de at ffffddf0.
+#+ATTR_HTML: :alt Decompiled func beside stack memory showing the input buffer and arg1
+[[./images/stack-buf-arg1.png]]
+
+ASCII =A= is =41=, =B= is =42=, =C= is =43=, and =D= is =44=. On little-endian
+x86, =ef be ad de= represents =0xdeadbeef=.
+
+Inspect the locations in the Debugger console:
+
+#+begin_src text
+x/32bx $ebp-0x2c
+x/1wx $ebp+8
+#+end_src
+
+The absolute addresses belong to this run; the offsets were verified in this
+function's assembly. Do not assume them for another function or binary.
+
+** Automatic Stack Variable Annotations
+
+1. Enable =Stack Variable Annotations= in Settings
+   (=debugger.stackVariableAnnotations=).
+2. If the debugger was already open, save the database and fully restart Binary
+   Ninja. In 6.0 the setting is read when the debugger controller is created.
+3. Reopen the binary, reconnect, launch, and stop inside =func=.
+4. Use =Create Stack View= with the stack pane in Linear view.
+
+Annotations are generated automatically when the target stops; there is no
+separate annotate command. At least two stack frames must be available.
+The screenshot above shows the manual mapping before automatic labels.
+
+* Calculate an Address Difference
+
+In the *Debugger* console:
+
+#+begin_src text
+p/x 0xffffddec - 0xffffddb8
+# (unsigned int) 0x00000034
+
+p/d 0xffffddec - 0xffffddb8
+# (unsigned int) 52
+#+end_src
+
+=p= means *print*: evaluate an expression and display its result. =/x= selects
+hexadecimal output; =/d= selects decimal. The difference is *0x34 = 52 bytes*.
+
+* References Used in This Session
+
+- [[https://docs.binary.ninja/guide/debugger/remote-debugging.html][Binary Ninja: remote debugging]]
+- [[https://docs.binary.ninja/guide/debugger/index.html#stack-variable-annotation][Binary Ninja: stack variable annotations]]
+- [[https://lldb.llvm.org/use/map.html][LLDB: command reference]]
+- [[https://github.com/Vector35/debugger/blob/dev/core/debuggercontroller.cpp][Debugger source: annotation setting read at controller creation]]
+- [[https://github.com/Vector35/debugger/blob/dev/ui/controlswidget.cpp][Debugger source: launch confirmation wording]]
